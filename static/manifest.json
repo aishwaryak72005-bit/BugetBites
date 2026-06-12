@@ -9,12 +9,12 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/static/icon-192.png",
+      "src": "https://via.placeholder.com/192/10B981/FFFFFF?text=SR",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/static/icon-512.png",
+      "src": "https://via.placeholder.com/512/10B981/FFFFFF?text=SR",
       "sizes": "512x512",
       "type": "image/png"
     }
