@@ -24,6 +24,7 @@
     <div class="card p-4 p-md-5 mb-4">
       <form method="POST" action="{% url 'suggest' %}" id="suggestForm">
         {% csrf_token %}
+        <input type="hidden" name="user_xp" class="hidden_user_xp" value="0">
 
         <!-- Ingredients -->
         <div class="mb-4">
@@ -601,7 +602,7 @@
   window.onload = function() {
       document.getElementById('suggestions').scrollIntoView({behavior:'smooth'});
       if(typeof addXP === 'function' && !sessionStorage.getItem('suggest_xp_given')) {
-          addXP(20, "Generated AI Suggestions!");
+          addXP(10, "Generated AI Suggestions!");
           sessionStorage.setItem('suggest_xp_given', 'true');
       }
   }

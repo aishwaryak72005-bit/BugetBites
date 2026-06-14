@@ -1373,7 +1373,7 @@
               btn.style.background = 'linear-gradient(135deg,#d1fae5,#a7f3d0)';
               btn.style.color = '#065f46';
               // Gamification
-              if(typeof addXP === 'function') addXP(50, "Saved a Recipe!");
+              if(typeof addXP === 'function') addXP(10, "Saved a Recipe!");
           } else {
               btn.innerHTML = '✅ Already Saved';
           }
@@ -1456,7 +1456,7 @@
   // ── Share Link ───────────────────────────────────────────────────
   function shareRecipeLink(name, description, btn) {
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Link...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
     
     const formData = new FormData();
     formData.append('recipe_name', name);
@@ -1472,14 +1472,12 @@
     .then(data => {
         if (data.status === 'saved' || data.status === 'exists') {
             const shareUrl = window.location.origin + '/share/' + data.share_id + '/';
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                btn.innerHTML = '📋 Link Copied!';
-                btn.style.background = '#0ea5e9'; // Change to blue
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = '#25D366';
-                }, 3000);
-            });
+            const text = encodeURIComponent('Check out this delicious recipe I generated on BudgetBites! 🍲🍳\n\n*' + name + '*\n' + description + '\n\n' + shareUrl);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+            btn.innerHTML = '✅ Shared!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 3000);
         } else {
             alert('Could not generate share link.');
             btn.innerHTML = originalText;
@@ -1487,7 +1485,7 @@
     })
     .catch(err => {
         console.error(err);
-        alert('Error generating share link.');
+        alert('Error generating share link. Please try again.');
         btn.innerHTML = originalText;
     });
   }
@@ -1808,7 +1806,7 @@
       
       // ADD XP LOGIC
       let currentXp = parseInt(localStorage.getItem('budgetbites_xp') || '0');
-      currentXp += 150;
+      currentXp += 20;
       localStorage.setItem('budgetbites_xp', currentXp);
       
       // Animate in
@@ -2246,7 +2244,7 @@
                         <div style="font-size: 5rem; margin-bottom: 20px; text-shadow: 0 0 40px rgba(251, 191, 36, 0.5); animation: pulseRing 3s ease-in-out infinite;">🏆</div>
                         <h2 style="font-weight: 900; font-size: 3rem; color: #F9FAFB; margin-bottom: 10px;">Recipe Mastered!</h2>
                         <div class="d-inline-block px-4 py-2" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; border-radius: 30px; color: #34D399; font-weight: 800; font-size: 1.2rem; box-shadow: 0 0 20px rgba(16,185,129,0.3);">
-                            +150 XP Earned
+                            +20 XP Earned
                         </div>
                         <div style="margin-top: 20px; width: 300px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-left: auto; margin-right: auto; overflow: hidden; position: relative;">
                             <div id="completion-xp-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #10B981, #34D399); transition: width 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s;"></div>

@@ -323,7 +323,7 @@ def parse_recipes(ai_response):
                 'ingredients': [],
                 'instructions': [],
                 'missing': [],
-                'dietary_preference': 'None',
+                'dietary_preference': [],
                 'tips': 'No tips available.',
                 'variations': 'No variations available.',
             }
@@ -767,11 +767,7 @@ def generate_view(request):
         except:
             user_xp = 0
             
-        recipe_count = 3
-        if user_xp >= 200:
-            recipe_count = 5
-        elif user_xp >= 100:
-            recipe_count = 4
+        recipe_count = 3 + (user_xp // 100)
 
         # Map cuisine values to modes
         festivals = ['diwali', 'holi', 'eid', 'navratri']
