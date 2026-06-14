@@ -569,17 +569,25 @@
       }
     </style>
     <!-- Web App Manifest -->
-  <link rel="manifest" href="{% static 'manifest.json' %}">
-  <meta name="theme-color" content="#059669">
-  <link rel="apple-touch-icon" href="https://via.placeholder.com/192/10B981/FFFFFF?text=SR">
-  
-  <script>
-    // Immediately apply theme before rendering to prevent white flash
-    if (localStorage.getItem('theme') === 'dark') {
-      document.documentElement.classList.add('dark-mode');
-    }
-  </script>
-</head>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#059669">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/cooking-book.png">
+    
+    <script>
+      // Immediately apply theme before rendering to prevent white flash
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+      // Register PWA Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker registered successfully!', reg.scope))
+            .catch(err => console.log('Service Worker registration failed:', err));
+        });
+      }
+    </script>
+  </head>
   <body>
     <nav class="navbar navbar-expand-sm navbar-dark fixed-top" style="z-index: 1030; min-height: 70px; background: rgba(17, 24, 39, 0.95) !important; border-bottom: 1px solid rgba(255,255,255,0.1);">
       <div class="container" style="max-width: 1400px; width: 95%;">

@@ -1,0 +1,21 @@
+{
+  "name": "BudgetBites SmartRecipe",
+  "short_name": "SmartRecipe",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#059669",
+  "description": "AI-Powered Culinary Assistant & Meal Planner",
+  "icons": [
+    {
+      "src": "https://img.icons8.com/color/512/cooking-book.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "https://img.icons8.com/color/192/cooking-book.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}

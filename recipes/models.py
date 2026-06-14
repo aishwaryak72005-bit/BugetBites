@@ -43,4 +43,17 @@ class MealPlan(models.Model):
         unique_together = ('user', 'day', 'meal_type')
 
     def __str__(self):
-        return f"{self.user.username} - {self.day} {self.meal_type}: {self.recipe_name}"
+        return f"{self.user.username} - {self.day} {self.meal_type}: {self.recipe_name}"
+
+
+class DailyRequestLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    request_count = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['-date']
+        unique_together = ('user', 'date')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.date}: {self.request_count} requests"

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from groq import Groq
-from .models import SavedRecipe, MealPlan
+from .models import SavedRecipe, MealPlan, DailyRequestLog
 import os
 import requests
 import urllib.parse as _urlparse
@@ -755,12 +755,34 @@ def generate_view(request):
 
 
     if request.method == 'POST':
+        from datetime import date
+        log, created = DailyRequestLog.objects.get_or_create(user=request.user, date=date.today())
+        
         ingredients = request.POST.get('ingredients', '')
         budget = request.POST.get('budget', '')
         serving_size = request.POST.get('serving_size', '2')
         cuisine = request.POST.get('cuisine', 'any')
         leftover_mode = request.POST.get('leftover_mode', False)
         selected_dish = request.POST.get('selected_dish', '')
+        
+        if log.request_count >= 5:
+            return render(request, 'recipes/generate.html', {
+                'quick_ingredients': quick_ingredients,
+                'quick_budgets': quick_budgets,
+                'error_message': "You have reached your daily limit of 5 recipe generations. Check back tomorrow! ⏰",
+                'quota_exceeded': True,
+                'quota_count': log.request_count,
+                'quota_limit': 5,
+                'ingredients': ingredients,
+                'budget': budget,
+                'serving_size': serving_size,
+                'cuisine': cuisine,
+            })
+            
+        # Increment request count
+        log.request_count += 1
+        log.save()
+        
         user_xp_str = request.POST.get('user_xp', '0')
         try:
             user_xp = int(user_xp_str)
@@ -928,6 +950,8 @@ You must return the response strictly in the following format:
                 'cuisine': cuisine,
                 'youtube_videos': youtube_videos,
                 'selected_dish': selected_dish,
+                'quota_count': log.request_count,
+                'quota_limit': 5,
             })
 
         except Exception as e:
@@ -936,11 +960,17 @@ You must return the response strictly in the following format:
                 'quick_ingredients': quick_ingredients,
                 'quick_budgets': quick_budgets,
                 'error_message': error_message,
+                'quota_count': log.request_count,
+                'quota_limit': 5,
             })
 
+    from datetime import date
+    log, _ = DailyRequestLog.objects.get_or_create(user=request.user, date=date.today())
     return render(request, 'recipes/generate.html', {
         'quick_ingredients': quick_ingredients,
         'quick_budgets': quick_budgets,
+        'quota_count': log.request_count,
+        'quota_limit': 5,
     })
 
 
@@ -1226,8 +1256,8 @@ None
 @require_POST
 def scan_fridge_api(request):
     """
-    Accept a base64-encoded image from the frontend, send it to Groq vision model,
-    and return a list of detected ingredients.
+    Accept a base64-encoded image from the frontend, send it to Gemini 1.5 Flash vision model,
+    with Groq vision as fallback, and return a list of detected ingredients.
     """
     try:
         data = json.loads(request.body)
@@ -1236,38 +1266,81 @@ def scan_fridge_api(request):
         if not image_data:
             return JsonResponse({'status': 'error', 'message': 'No image provided'}, status=400)
 
-        # Groq vision API call using llama-4-scout (vision capable)
-        response = client.chat.completions.create(
-            model="meta-llama/llama-4-scout-17b-16e-instruct",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": image_data,
-                            },
-                        },
-                        {
-                            "type": "text",
-                            "text": (
-                                "Look carefully at this image. Identify ALL visible food ingredients, "
-                                "vegetables, fruits, dairy, meat, spices, condiments, and pantry items. "
-                                "Reply ONLY with a comma-separated list of ingredient names. "
-                                "Use simple common names (e.g. 'onion, tomato, milk, eggs, carrot'). "
-                                "Do NOT include quantities, descriptions, or any extra text. "
-                                "If you cannot identify any food items, reply with exactly: NONE"
-                            )
-                        }
-                    ],
-                }
-            ],
-            max_tokens=200,
-            temperature=0.1,
+        # Parse base64 parts
+        if ',' in image_data:
+            header, _, base64_str = image_data.partition(',')
+            mime_type = "image/jpeg"
+            if 'image/png' in header:
+                mime_type = "image/png"
+            elif 'image/webp' in header:
+                mime_type = "image/webp"
+        else:
+            base64_str = image_data
+            mime_type = "image/jpeg"
+
+        prompt_text = (
+            "Look carefully at this image. Identify ALL visible food ingredients, "
+            "vegetables, fruits, dairy, meat, spices, condiments, and pantry items. "
+            "Reply ONLY with a comma-separated list of ingredient names. "
+            "Use simple common names (e.g. 'onion, tomato, milk, eggs, carrot'). "
+            "Do NOT include quantities, descriptions, or any extra text. "
+            "If you cannot identify any food items, reply with exactly: NONE"
         )
 
-        result_text = response.choices[0].message.content.strip()
+        # Try Gemini 1.5 Flash Vision first
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt_text},
+                        {
+                            "inlineData": {
+                                "mimeType": mime_type,
+                                "data": base64_str
+                            }
+                        }
+                    ]
+                }
+            ],
+            "generationConfig": {
+                "temperature": 0.1,
+                "maxOutputTokens": 200
+            }
+        }
+
+        try:
+            data_bytes = json.dumps(payload).encode('utf-8')
+            req = urllib.request.Request(url, data=data_bytes, headers={'Content-Type': 'application/json'})
+            with urllib.request.urlopen(req) as response:
+                result = json.loads(response.read().decode())
+                result_text = result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '').strip()
+        except Exception as gemini_err:
+            print(f"Gemini Vision API Error: {gemini_err}. Falling back to Groq Vision.")
+            # Groq vision API fallback call using llama-3.2-11b-vision-preview
+            response = client.chat.completions.create(
+                model="llama-3.2-11b-vision-preview",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": image_data,
+                                },
+                            },
+                            {
+                                "type": "text",
+                                "text": prompt_text
+                            }
+                        ],
+                    }
+                ],
+                max_tokens=200,
+                temperature=0.1,
+            )
+            result_text = response.choices[0].message.content.strip()
 
         if result_text.upper() == 'NONE' or not result_text:
             return JsonResponse({

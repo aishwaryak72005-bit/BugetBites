@@ -353,6 +353,30 @@
 
         </div>
 
+        <!-- Daily Quota Tracker -->
+        <div class="d-flex align-items-center justify-content-between mb-3 px-2">
+          <span style="font-size: 0.9rem; font-weight: 700; color: #064E3B;"><i class="fas fa-bolt me-1 text-warning"></i> Daily Generation Quota</span>
+          <span class="badge {% if quota_count >= quota_limit %}bg-danger{% elif quota_count >= 4 %}bg-warning text-dark{% else %}bg-success{% endif %} p-2 rounded-pill fw-bold" style="font-size: 0.85rem;">
+            {{ quota_count|default:0 }} / {{ quota_limit|default:5 }} used today
+          </span>
+        </div>
+
+        {% if quota_count >= quota_limit %}
+        <div class="alert alert-danger p-3 mb-4 border-0 d-flex align-items-center gap-3 animate__animated animate__fadeIn" style="border-radius: 16px;">
+          <span style="font-size: 1.5rem;">⏰</span>
+          <div class="text-start">
+            <div class="fw-bold" style="font-size: 0.95rem; color: #991b1b;">Daily Limit Reached</div>
+            <div style="font-size: 0.8rem; color: #b91c1c;">You have generated {{ quota_limit|default:5 }} recipes today. Please check back tomorrow when your daily quota resets!</div>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn w-100 btn-lg disabled"
+          style="font-size: 1.1rem; padding: 16px; background: #6b7280; border: none; color: #d1d5db; cursor: not-allowed;"
+        >
+          <i class="fas fa-lock me-2"></i> Daily Quota Reached
+        </button>
+        {% else %}
         <input type="hidden" name="user_xp" id="hidden_user_xp" value="0">
         <button
           type="submit"
@@ -362,6 +386,7 @@
         >
           <i class="fas fa-magic me-2"></i> Generate My Recipes with AI ✨
         </button>
+        {% endif %}
       </form>
     </div>
 
