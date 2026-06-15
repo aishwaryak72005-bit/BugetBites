@@ -115,6 +115,13 @@
         <button type="submit" id="submitBtn" class="btn btn-purple w-100 btn-lg">
           <i class="fas fa-sign-in-alt me-2"></i> Login to My Account
         </button>
+
+        <!-- Forgot Password Link -->
+        <div class="text-center mt-3">
+          <a href="{% url 'password_reset' %}" style="color: #6B7280; font-size: 0.88rem; text-decoration: none;">
+            <i class="fas fa-key me-1"></i> Forgot your password?
+          </a>
+        </div>
       </form>
       <div class="text-center mt-4">
         <p class="text-muted mb-0" style="font-size: 0.9rem">

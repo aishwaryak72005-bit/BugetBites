@@ -1,0 +1,11 @@
+R_DEF: Internal format may change without notice
+local
+color black
+color emerald_dark
+color emerald_primary
+color white
+drawable app_logo
+id webView
+layout activity_main
+string app_name
+style Theme.BudgetBites

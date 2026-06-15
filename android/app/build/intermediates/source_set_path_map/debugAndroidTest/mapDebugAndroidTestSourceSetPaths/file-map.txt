@@ -1,0 +1,7 @@
+com.budgetbites.app.test.app-jetified-core-1.5.0-0 C:\Users\Admin\.gradle\caches\8.13\transforms\1ed4aa8ec8b0b59a09a77231838abd7b\transformed\jetified-core-1.5.0\res
+com.budgetbites.app.test.app-jetified-annotation-experimental-1.3.0-1 C:\Users\Admin\.gradle\caches\8.13\transforms\c1f69182e95b8b33c6e9f905baf2afe8\transformed\jetified-annotation-experimental-1.3.0\res
+com.budgetbites.app.test.app-androidTest-2 C:\Users\Admin\OneDrive\Desktop\smartrecipe\android\app\build\generated\res\resValues\androidTest\debug
+com.budgetbites.app.test.app-updated_navigation_xml-3 C:\Users\Admin\OneDrive\Desktop\smartrecipe\android\app\build\generated\updated_navigation_xml\debugAndroidTest
+com.budgetbites.app.test.app-mergeDebugAndroidTestResources-4 C:\Users\Admin\OneDrive\Desktop\smartrecipe\android\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.budgetbites.app.test.app-mergeDebugAndroidTestResources-5 C:\Users\Admin\OneDrive\Desktop\smartrecipe\android\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.budgetbites.app.test.app-debugAndroidTest-6 C:\Users\Admin\OneDrive\Desktop\smartrecipe\android\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
