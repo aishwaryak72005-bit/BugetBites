@@ -1,24 +1,169 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-  .dark-mode .profile-stat-value { color: #10B981 !important; }
-  .dark-mode .profile-xp-value   { color: #F59E0B !important; }
-  .dark-mode .profile-theme-text { color: #A78BFA !important; }
-  .email-warning {
-    background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(234,88,12,0.08));
-    border: 1.5px solid rgba(245,158,11,0.4);
-    border-radius: 16px;
-    padding: 14px 18px;
+  /* ── Hero Banner ─────────────────────────────────────────── */
+  .profile-hero {
+    background: linear-gradient(135deg, #064E3B 0%, #065F46 40%, #1E3A5F 100%);
+    border-radius: 24px;
+    padding: 40px 36px 80px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;
   }
-  .dark-mode .email-warning {
-    background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(234,88,12,0.06));
-    border-color: rgba(245,158,11,0.3);
+  .profile-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(16,185,129,0.25), transparent 70%);
+    border-radius: 50%;
   }
+  .profile-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(124,58,237,0.2), transparent 70%);
+    border-radius: 50%;
+  }
+  .avatar-ring {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10B981, #059669);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem; color: white;
+    border: 4px solid rgba(255,255,255,0.25);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    position: relative; z-index: 1;
+    flex-shrink: 0;
+  }
+  .level-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.78rem; font-weight: 700;
+    color: #FDE68A;
+    backdrop-filter: blur(8px);
+  }
+  .hero-username {
+    font-size: 1.8rem; font-weight: 900;
+    color: #fff; letter-spacing: -0.5px; margin: 0;
+  }
+  .hero-email {
+    color: rgba(255,255,255,0.7); font-size: 0.88rem; margin: 2px 0 0;
+  }
+  .hero-joined {
+    color: rgba(255,255,255,0.5); font-size: 0.8rem;
+  }
+
+  /* ── Stats Row (overlapping hero) ────────────────────────── */
+  .stats-overlap {
+    margin-top: -52px;
+    position: relative; z-index: 10;
+  }
+  .stat-card {
+    background: var(--card-bg, #fff);
+    border-radius: 20px;
+    padding: 20px 16px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+  .stat-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.14); }
+  .dark-mode .stat-card {
+    background: #1F2937;
+    border-color: rgba(255,255,255,0.06);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .stat-icon {
+    width: 52px; height: 52px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin: 0 auto 10px;
+  }
+  .stat-value {
+    font-size: 1.9rem; font-weight: 900; line-height: 1;
+    background: linear-gradient(135deg, #059669, #10B981);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-value.xp-val {
+    background: linear-gradient(135deg, #F59E0B, #FBBF24);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-value.level-val {
+    background: linear-gradient(135deg, #7C3AED, #A78BFA);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: #9CA3AF; margin-top: 4px;
+  }
+
+  /* ── XP Progress Bar ─────────────────────────────────────── */
+  .xp-bar-track {
+    height: 10px; border-radius: 99px;
+    background: #E5E7EB; overflow: hidden;
+  }
+  .dark-mode .xp-bar-track { background: #374151; }
+  .xp-bar-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #F59E0B, #FBBF24);
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── Section Cards ───────────────────────────────────────── */
+  .profile-card {
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+  }
+  .dark-mode .profile-card {
+    border-color: rgba(255,255,255,0.06);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .profile-card .card-header-strip {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 0.95rem;
+  }
+  .dark-mode .profile-card .card-header-strip {
+    border-bottom-color: rgba(255,255,255,0.05);
+  }
+  .strip-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  /* ── Quick Actions ───────────────────────────────────────── */
+  .quick-action {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+  .quick-action:hover {
+    background: rgba(5,150,105,0.06);
+    border-color: rgba(5,150,105,0.15);
+    transform: translateX(4px);
+  }
+  .dark-mode .quick-action:hover { background: rgba(16,185,129,0.08); }
+  .qa-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .qa-label { font-weight: 600; font-size: 0.9rem; }
+  .qa-sub   { font-size: 0.78rem; color: #9CA3AF; }
+
+  /* ── Email Section ───────────────────────────────────────── */
   .email-input-profile {
-    border-radius: 12px !important;
-    border: 2px solid #E2E8F0 !important;
-    padding: 11px 16px !important;
-    font-size: 0.95rem !important;
+    border-radius: 12px !important; border: 2px solid #E2E8F0 !important;
+    padding: 11px 16px !important; font-size: 0.9rem !important;
     transition: all 0.2s ease !important;
   }
   .email-input-profile:focus {
@@ -26,212 +171,323 @@
     box-shadow: 0 0 0 4px rgba(16,185,129,0.15) !important;
   }
   .dark-mode .email-input-profile {
-    background: #374151 !important;
-    border-color: rgba(255,255,255,0.1) !important;
+    background: #374151 !important; border-color: rgba(255,255,255,0.1) !important;
     color: #F9FAFB !important;
   }
+
+  /* ── Warning Banner ──────────────────────────────────────── */
+  .email-warning {
+    background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(234,88,12,0.08));
+    border: 1.5px solid rgba(245,158,11,0.35);
+    border-radius: 16px; padding: 14px 18px;
+  }
+
+  /* ── Animations ──────────────────────────────────────────── */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .anim-1 { animation: fadeSlideUp 0.5s ease both; }
+  .anim-2 { animation: fadeSlideUp 0.5s 0.1s ease both; }
+  .anim-3 { animation: fadeSlideUp 0.5s 0.2s ease both; }
+  .anim-4 { animation: fadeSlideUp 0.5s 0.3s ease both; }
 </style>
 
-<div class="row justify-content-center mt-2">
+<div class="row justify-content-center mt-2 mb-5">
   <div class="col-lg-8">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="fw-bold mb-0">My Profile</h3>
-    </div>
 
-    <!-- ⚠️ Email Missing Warning Banner -->
+    <!-- ── Email Warning ─────────────────────────────────── -->
     {% if not user.email %}
-    <div class="email-warning mb-4 d-flex align-items-start gap-3">
-      <i class="fas fa-exclamation-triangle mt-1" style="color:#F59E0B; font-size:1.3rem; flex-shrink:0;"></i>
+    <div class="email-warning mb-4 d-flex align-items-start gap-3 anim-1">
+      <i class="fas fa-exclamation-triangle mt-1" style="color:#F59E0B;font-size:1.3rem;flex-shrink:0;"></i>
       <div>
-        <p class="fw-bold mb-1" style="color:#B45309; font-size:0.95rem;">
-          No Email Address on Your Account!
-        </p>
-        <p class="mb-0 text-muted" style="font-size:0.85rem;">
-          Without an email, you <strong>cannot reset your password</strong> if you forget it.
-          Add your email below to stay safe! 👇
-        </p>
+        <p class="fw-bold mb-1" style="color:#B45309;font-size:0.92rem;">No Email on Your Account!</p>
+        <p class="mb-0 text-muted" style="font-size:0.83rem;">Without an email, you <strong>cannot reset your password</strong> if forgotten. Add it below! 👇</p>
       </div>
     </div>
     {% endif %}
 
-    <!-- Profile Card -->
-    <div class="card p-4 mb-4" style="border-radius: 20px;">
-      <div class="d-flex align-items-center mb-4">
-        <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:80px;height:80px;background:rgba(5,150,105,0.1);color:#059669;font-size:2.5rem;">
-          <i class="fas fa-user"></i>
+    <!-- ── Hero Banner ───────────────────────────────────── -->
+    <div class="profile-hero anim-1">
+      <div class="d-flex align-items-center gap-4" style="position:relative;z-index:1;">
+        <div class="avatar-ring">
+          {{ user.username|first|upper }}
         </div>
-        <div class="ms-4">
-          <h4 class="fw-bold mb-1">{{ user.username }}</h4>
-          <p class="text-muted mb-0">
-            <i class="fas fa-envelope me-2"></i>
-            {% if user.email %}
-              {{ user.email }}
-              <span class="badge ms-1" style="background:rgba(16,185,129,0.15);color:#059669;font-size:0.7rem;">✅ Verified</span>
-            {% else %}
-              <span style="color:#F59E0B;">⚠️ No email — please add one below</span>
-            {% endif %}
+        <div>
+          <div class="level-badge mb-2">
+            <i class="fas fa-bolt"></i>
+            <span id="heroBadgeText">Chef</span>
+          </div>
+          <h2 class="hero-username">{{ user.username }}</h2>
+          <p class="hero-email mb-0">
+            <i class="fas fa-envelope me-1"></i>
+            {{ user.email|default:"No email yet" }}
+            {% if user.email %}<span class="badge ms-1" style="background:rgba(16,185,129,0.3);color:#6EE7B7;font-size:0.65rem;">✅</span>{% endif %}
           </p>
-          <p class="text-muted mb-0"><i class="fas fa-calendar-alt me-2"></i>Joined {{ user.date_joined|date:"F Y" }}</p>
+          <p class="hero-joined mt-1">
+            <i class="fas fa-calendar-alt me-1"></i> Joined {{ user.date_joined|date:"F Y" }}
+          </p>
         </div>
       </div>
+    </div>
 
-      <hr style="border-color:#E5E7EB;">
-
-      <h5 class="fw-bold mb-3 mt-3">Statistics</h5>
+    <!-- ── Stats Overlap Row ──────────────────────────────── -->
+    <div class="stats-overlap px-2 anim-2">
       <div class="row g-3">
-        <div class="col-md-6">
-          <div class="p-4 rounded" style="background:rgba(5,150,105,0.05);border:1px solid rgba(5,150,105,0.1);">
-            <div class="d-flex align-items-center">
-              <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width:48px;height:48px;background:#059669;color:white;font-size:1.2rem;">
-                <i class="fas fa-heart"></i>
-              </div>
-              <div>
-                <p class="mb-0 text-muted" style="font-size:0.9rem;font-weight:600;text-transform:uppercase;">Saved Recipes</p>
-                <h3 class="fw-bold mb-0 profile-stat-value" style="color:#064E3B;">{{ saved_recipes_count }}</h3>
-              </div>
+        <!-- Saved Recipes -->
+        <div class="col-4">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(5,150,105,0.12);">
+              <i class="fas fa-heart" style="color:#059669;"></i>
             </div>
+            <div class="stat-value">{{ saved_recipes_count }}</div>
+            <div class="stat-label">Saved</div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="p-4 rounded" style="background:rgba(245,158,11,0.05);border:1px solid rgba(245,158,11,0.1);">
-            <div class="d-flex align-items-center">
-              <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width:48px;height:48px;background:#F59E0B;color:white;font-size:1.2rem;">
-                <i class="fas fa-star"></i>
-              </div>
-              <div>
-                <p class="mb-0 text-muted" style="font-size:0.9rem;font-weight:600;text-transform:uppercase;">Experience (XP)</p>
-                <h3 class="fw-bold mb-0 profile-xp-value" style="color:#92400E;" id="profileXPDisplay">0 XP</h3>
-              </div>
+        <!-- XP -->
+        <div class="col-4">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(245,158,11,0.12);">
+              <i class="fas fa-star" style="color:#F59E0B;"></i>
             </div>
+            <div class="stat-value xp-val" id="statXP">0</div>
+            <div class="stat-label">XP Earned</div>
+          </div>
+        </div>
+        <!-- Level -->
+        <div class="col-4">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:rgba(124,58,237,0.12);">
+              <i class="fas fa-trophy" style="color:#7C3AED;"></i>
+            </div>
+            <div class="stat-value level-val" id="statLevel">1</div>
+            <div class="stat-label">Level</div>
           </div>
         </div>
       </div>
+    </div>
 
-      <h5 class="fw-bold mb-3 mt-4">Appearance</h5>
-      <div class="p-4 rounded d-flex justify-content-between align-items-center" style="background:rgba(139,92,246,0.05);border:1px solid rgba(139,92,246,0.1);">
-        <div class="d-flex align-items-center">
-          <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width:48px;height:48px;background:#8B5CF6;color:white;font-size:1.2rem;">
-            <i class="fas fa-moon" id="themeIcon"></i>
+    <!-- ── XP Progress Card ──────────────────────────────── -->
+    <div class="card profile-card mt-4 p-0 anim-3">
+      <div class="card-header-strip">
+        <div class="strip-dot" style="background:#F59E0B;"></div>
+        <span>Level Progress</span>
+        <span class="ms-auto text-muted" style="font-size:0.8rem;" id="xpProgressLabel">0 / 100 XP</span>
+      </div>
+      <div class="p-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold" style="font-size:0.88rem;" id="currentLevelLabel">🍳 Level 1 — Beginner Cook</span>
+          <span class="fw-bold" style="font-size:0.88rem;color:#F59E0B;" id="nextLevelLabel">Level 2 →</span>
+        </div>
+        <div class="xp-bar-track">
+          <div class="xp-bar-fill" id="xpBarFill" style="width:0%;"></div>
+        </div>
+        <p class="text-muted mt-2 mb-0" style="font-size:0.78rem;">
+          <i class="fas fa-info-circle me-1" style="color:#F59E0B;"></i>
+          Earn XP by generating recipes, saving meals and using cooking tips!
+        </p>
+      </div>
+    </div>
+
+    <!-- ── Quick Actions ─────────────────────────────────── -->
+    <div class="card profile-card mt-4 p-0 anim-3">
+      <div class="card-header-strip">
+        <div class="strip-dot" style="background:#059669;"></div>
+        <span>Quick Actions</span>
+      </div>
+      <div class="p-3">
+        <a href="{% url 'generate' %}" class="quick-action">
+          <div class="qa-icon" style="background:rgba(5,150,105,0.1);">
+            <i class="fas fa-magic" style="color:#059669;"></i>
           </div>
           <div>
-            <h6 class="fw-bold mb-1 profile-theme-text" style="color:#4C1D95;" id="themeText">Dark Mode</h6>
-            <p class="mb-0 text-muted" style="font-size:0.85rem;">Toggle between dark and light themes</p>
+            <div class="qa-label">Generate Recipe</div>
+            <div class="qa-sub">Create a new AI-powered recipe</div>
+          </div>
+          <i class="fas fa-chevron-right ms-auto text-muted" style="font-size:0.8rem;"></i>
+        </a>
+        <a href="{% url 'saved_recipes' %}" class="quick-action">
+          <div class="qa-icon" style="background:rgba(239,68,68,0.1);">
+            <i class="fas fa-heart" style="color:#EF4444;"></i>
+          </div>
+          <div>
+            <div class="qa-label">My Saved Recipes</div>
+            <div class="qa-sub">{{ saved_recipes_count }} recipes saved</div>
+          </div>
+          <i class="fas fa-chevron-right ms-auto text-muted" style="font-size:0.8rem;"></i>
+        </a>
+        <a href="{% url 'meal_planner' %}" class="quick-action">
+          <div class="qa-icon" style="background:rgba(124,58,237,0.1);">
+            <i class="fas fa-calendar-week" style="color:#7C3AED;"></i>
+          </div>
+          <div>
+            <div class="qa-label">Meal Planner</div>
+            <div class="qa-sub">Plan your weekly meals</div>
+          </div>
+          <i class="fas fa-chevron-right ms-auto text-muted" style="font-size:0.8rem;"></i>
+        </a>
+        <a href="{% url 'cooking_tips' %}" class="quick-action">
+          <div class="qa-icon" style="background:rgba(245,158,11,0.1);">
+            <i class="fas fa-lightbulb" style="color:#F59E0B;"></i>
+          </div>
+          <div>
+            <div class="qa-label">Cooking Tips</div>
+            <div class="qa-sub">Learn AI cooking secrets</div>
+          </div>
+          <i class="fas fa-chevron-right ms-auto text-muted" style="font-size:0.8rem;"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- ── Appearance ─────────────────────────────────────── -->
+    <div class="card profile-card mt-4 p-0 anim-4">
+      <div class="card-header-strip">
+        <div class="strip-dot" style="background:#8B5CF6;"></div>
+        <span>Appearance</span>
+      </div>
+      <div class="p-4 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <div class="qa-icon" style="background:rgba(139,92,246,0.1);">
+            <i class="fas fa-moon" id="themeIcon" style="color:#8B5CF6;"></i>
+          </div>
+          <div>
+            <div class="fw-bold" id="themeText">Dark Mode</div>
+            <div style="font-size:0.8rem;color:#9CA3AF;">Toggle between dark and light</div>
           </div>
         </div>
-        <div class="form-check form-switch" style="transform:scale(1.3);">
+        <div class="form-check form-switch mb-0" style="transform:scale(1.4);">
           <input class="form-check-input" type="checkbox" role="switch" id="themeToggle" style="cursor:pointer;">
         </div>
       </div>
     </div>
 
-    <!-- ✉️ Add / Update Email Card -->
-    <div class="card p-4 mb-4" style="border-radius:20px;">
-      <h5 class="fw-bold mb-1">
-        <i class="fas fa-envelope me-2" style="color:#059669;"></i>
-        {% if user.email %}Update Email Address{% else %}Add Email Address{% endif %}
-      </h5>
-      <p class="text-muted mb-3" style="font-size:0.88rem;">
-        {% if user.email %}
-          Change the email linked to your account.
-        {% else %}
-          <strong style="color:#F59E0B;">Required for password recovery!</strong>
-          Add your email so you can reset your password if you forget it.
+    <!-- ── Email Section ──────────────────────────────────── -->
+    <div class="card profile-card mt-4 p-0 anim-4">
+      <div class="card-header-strip">
+        <div class="strip-dot" style="background:#059669;"></div>
+        <span>{% if user.email %}Update Email{% else %}Add Email Address{% endif %}</span>
+        {% if not user.email %}
+        <span class="badge ms-2" style="background:rgba(245,158,11,0.2);color:#F59E0B;font-size:0.7rem;">Required for password recovery</span>
         {% endif %}
-      </p>
-
-      <!-- Success / Error messages -->
-      {% for message in messages %}
-        {% if 'email' in message.tags or message.level == 25 %}
-        <div class="alert alert-success rounded-3 py-2 mb-3" style="font-size:0.88rem;">
-          <i class="fas fa-check-circle me-1"></i> {{ message }}
-        </div>
-        {% elif message.level == 40 %}
-        <div class="alert alert-danger rounded-3 py-2 mb-3" style="font-size:0.88rem;">
-          <i class="fas fa-exclamation-circle me-1"></i> {{ message }}
-        </div>
-        {% endif %}
-      {% endfor %}
-
-      <form method="POST" action="{% url 'update_email' %}" id="emailForm">
-        {% csrf_token %}
-        <div class="d-flex gap-2 align-items-start flex-wrap">
-          <div class="flex-grow-1">
-            <input
-              type="email"
-              name="email"
-              class="form-control email-input-profile"
-              placeholder="yourname@gmail.com"
-              value="{{ user.email|default:'' }}"
-              required
-            />
+      </div>
+      <div class="p-4">
+        {% for message in messages %}
+          {% if message.level == 25 %}
+          <div class="alert alert-success rounded-3 py-2 mb-3" style="font-size:0.85rem;">
+            <i class="fas fa-check-circle me-1"></i> {{ message }}
           </div>
-          <button type="submit" id="emailBtn" class="btn btn-purple" style="white-space:nowrap;">
-            <i class="fas fa-save me-1"></i>
-            {% if user.email %}Update Email{% else %}Add Email{% endif %}
-          </button>
-        </div>
-        <small class="text-muted mt-2 d-block" style="font-size:0.78rem;">
-          <i class="fas fa-shield-alt me-1" style="color:#10B981;"></i>
-          Your email is private and only used for password recovery.
-        </small>
-      </form>
+          {% elif message.level == 40 %}
+          <div class="alert alert-danger rounded-3 py-2 mb-3" style="font-size:0.85rem;">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ message }}
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        <form method="POST" action="{% url 'update_email' %}">
+          {% csrf_token %}
+          <div class="d-flex gap-2 flex-wrap">
+            <input type="email" name="email" class="form-control email-input-profile flex-grow-1"
+              placeholder="yourname@gmail.com" value="{{ user.email|default:'' }}" required />
+            <button type="submit" class="btn btn-purple" style="white-space:nowrap;">
+              <i class="fas fa-save me-1"></i>
+              {% if user.email %}Update{% else %}Save Email{% endif %}
+            </button>
+          </div>
+          <small class="text-muted mt-2 d-block" style="font-size:0.76rem;">
+            <i class="fas fa-shield-alt me-1" style="color:#10B981;"></i>
+            Private — only used for password recovery. Never shared.
+          </small>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── Danger Zone ────────────────────────────────────── -->
+    <div class="card profile-card mt-4 p-0 anim-4">
+      <div class="card-header-strip">
+        <div class="strip-dot" style="background:#EF4444;"></div>
+        <span>Account</span>
+      </div>
+      <div class="p-4">
+        <a href="{% url 'logout' %}" class="btn w-100" style="background:rgba(239,68,68,0.08);border:1.5px solid rgba(239,68,68,0.2);color:#EF4444;border-radius:12px;font-weight:600;">
+          <i class="fas fa-sign-out-alt me-2"></i> Logout from BudgetBites
+        </a>
+      </div>
     </div>
 
   </div>
 </div>
 
-
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Update XP from localStorage
-    const profileXP = document.getElementById('profileXPDisplay');
-    if (profileXP) {
-        let currentXP = parseInt(localStorage.getItem('budgetbites_xp')) || 0;
-        profileXP.textContent = currentXP + ' XP';
-    }
+document.addEventListener('DOMContentLoaded', function () {
 
-    // Theme Toggle Logic
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    const themeText = document.getElementById('themeText');
-    const htmlEl = document.documentElement;
-    const bodyEl = document.body;
-    
-    // Check current theme
-    const currentTheme = localStorage.getItem('theme') || 'dark';
-    if (currentTheme === 'light') {
-        themeToggle.checked = false;
-        themeIcon.className = 'fas fa-sun';
-        themeText.textContent = 'Light Mode';
-        htmlEl.setAttribute('data-bs-theme', 'light');
-        htmlEl.classList.remove('dark-mode');
-        bodyEl.classList.add('light-mode');
+  // ── XP & Level Logic ──────────────────────────────────────
+  const xp = parseInt(localStorage.getItem('budgetbites_xp')) || 0;
+
+  const levels = [
+    { min: 0,   max: 99,  label: '🍳 Beginner Cook',    badge: 'Beginner' },
+    { min: 100, max: 249, label: '🥘 Home Chef',         badge: 'Home Chef' },
+    { min: 250, max: 499, label: '🍜 Skilled Cook',      badge: 'Skilled Cook' },
+    { min: 500, max: 999, label: '👨‍🍳 Pro Chef',          badge: 'Pro Chef' },
+    { min: 1000,max: 9999,label: '⭐ Master Chef',        badge: 'Master Chef' },
+  ];
+
+  let lvlIndex = 0;
+  for (let i = 0; i < levels.length; i++) {
+    if (xp >= levels[i].min) lvlIndex = i;
+  }
+  const lvl  = levels[lvlIndex];
+  const next = levels[Math.min(lvlIndex + 1, levels.length - 1)];
+  const pct  = lvlIndex === levels.length - 1
+    ? 100
+    : Math.round(((xp - lvl.min) / (next.min - lvl.min)) * 100);
+
+  // Update DOM
+  document.getElementById('statXP').textContent        = xp;
+  document.getElementById('statLevel').textContent     = lvlIndex + 1;
+  document.getElementById('heroBadgeText').textContent = lvl.badge;
+  document.getElementById('currentLevelLabel').textContent = `${lvl.label}`;
+  document.getElementById('nextLevelLabel').textContent =
+    lvlIndex === levels.length - 1 ? '🏆 Max Level!' : `Level ${lvlIndex + 2} →`;
+  document.getElementById('xpProgressLabel').textContent =
+    lvlIndex === levels.length - 1 ? `${xp} XP — Max!` : `${xp} / ${next.min} XP`;
+
+  // Animate bar
+  setTimeout(() => {
+    document.getElementById('xpBarFill').style.width = pct + '%';
+  }, 300);
+
+  // ── Theme Toggle ──────────────────────────────────────────
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon   = document.getElementById('themeIcon');
+  const themeText   = document.getElementById('themeText');
+  const htmlEl      = document.documentElement;
+  const bodyEl      = document.body;
+
+  function applyTheme(mode) {
+    if (mode === 'light') {
+      themeToggle.checked = false;
+      themeIcon.className = 'fas fa-sun';
+      themeText.textContent = 'Light Mode';
+      htmlEl.setAttribute('data-bs-theme', 'light');
+      htmlEl.classList.remove('dark-mode');
+      bodyEl.classList.add('light-mode');
     } else {
-        themeToggle.checked = true;
-        themeIcon.className = 'fas fa-moon';
-        themeText.textContent = 'Dark Mode';
-        htmlEl.setAttribute('data-bs-theme', 'dark');
-        htmlEl.classList.add('dark-mode');
-        bodyEl.classList.remove('light-mode');
+      themeToggle.checked = true;
+      themeIcon.className = 'fas fa-moon';
+      themeText.textContent = 'Dark Mode';
+      htmlEl.setAttribute('data-bs-theme', 'dark');
+      htmlEl.classList.add('dark-mode');
+      bodyEl.classList.remove('light-mode');
     }
+  }
 
-    themeToggle.addEventListener('change', function() {
-        if (this.checked) {
-            localStorage.setItem('theme', 'dark');
-            themeIcon.className = 'fas fa-moon';
-            themeText.textContent = 'Dark Mode';
-            htmlEl.setAttribute('data-bs-theme', 'dark');
-            htmlEl.classList.add('dark-mode');
-            bodyEl.classList.remove('light-mode');
-        } else {
-            localStorage.setItem('theme', 'light');
-            themeIcon.className = 'fas fa-sun';
-            themeText.textContent = 'Light Mode';
-            htmlEl.setAttribute('data-bs-theme', 'light');
-            htmlEl.classList.remove('dark-mode');
-            bodyEl.classList.add('light-mode');
-        }
-    });
+  applyTheme(localStorage.getItem('theme') || 'dark');
+
+  themeToggle.addEventListener('change', function () {
+    const mode = this.checked ? 'dark' : 'light';
+    localStorage.setItem('theme', mode);
+    applyTheme(mode);
   });
+});
 </script>
 {% endblock %}
