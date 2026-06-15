@@ -92,10 +92,16 @@
         {% csrf_token %} {% for field in form %}
         <div class="mb-3">
           <label class="form-label" style="font-weight: 600">
-            <i class="fas fa-pen me-1" style="color: #059669"></i>
+            {% if field.html_name == 'username' %}
+              <i class="fas fa-user me-1" style="color: #059669"></i>
+            {% elif field.html_name == 'email' %}
+              <i class="fas fa-envelope me-1" style="color: #059669"></i>
+            {% else %}
+              <i class="fas fa-lock me-1" style="color: #059669"></i>
+            {% endif %}
             {{ field.label }}
           </label>
-          
+
           {% if field.field.widget.input_type == 'password' %}
           <div style="position: relative;">
             <input
@@ -115,21 +121,24 @@
             type="{{ field.field.widget.input_type }}"
             name="{{ field.html_name }}"
             class="form-control form-control-lg login-input"
-            placeholder="Enter {{ field.label }}"
+            placeholder="{% if field.html_name == 'email' %}e.g. yourname@gmail.com{% else %}Enter {{ field.label }}{% endif %}"
             value="{{ field.value|default_if_none:'' }}"
             required
           />
+          {% if field.html_name == 'email' %}
+          <small class="text-muted mt-1 d-block" style="font-size: 0.78rem;">
+            <i class="fas fa-shield-alt me-1" style="color:#10B981;"></i>
+            Used only for password recovery. We won't spam you!
+          </small>
+          {% endif %}
           {% endif %}
 
           {% if field.errors %}
-          <div
-            class="mt-1"
-            style="color: #DC2626; font-size: 0.82rem; font-weight: 500"
-          >
+          <div class="mt-1" style="color: #DC2626; font-size: 0.82rem; font-weight: 500">
             <i class="fas fa-exclamation-circle me-1"></i>
             {{ field.errors|striptags }}
           </div>
-          {% endif %} {% if field.help_text %}
+          {% endif %} {% if field.help_text and field.html_name != 'email' %}
           <div class="mt-1 text-muted" style="font-size: 0.78rem">
             <i class="fas fa-info-circle me-1"></i>
             {{ field.help_text }}

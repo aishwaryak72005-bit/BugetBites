@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from .forms import RegisterForm
 from recipes.models import SavedRecipe, DailyRequestLog
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
@@ -17,7 +18,7 @@ import json
 # Register View
 def register_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
@@ -26,8 +27,8 @@ def register_view(request):
         else:
             messages.error(request, 'Please fix the errors below.')
     else:
-        form = UserCreationForm()
-    
+        form = RegisterForm()
+
     return render(request, 'users/register.html', {'form': form})
 
 # Login View
