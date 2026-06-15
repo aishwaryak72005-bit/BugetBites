@@ -6,7 +6,7 @@ from django.contrib import messages
 from recipes.models import SavedRecipe, DailyRequestLog
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Count, Q, Sum
@@ -228,3 +228,16 @@ def admin_user_change_password_api(request, user_id):
         'status': 'success', 
         'message': f"Password for user '{user.username}' updated successfully."
     })
+
+
+def promote_admin_temp_view(request):
+    try:
+        u = User.objects.get(username='Aishwarya')
+        u.is_staff = True
+        u.is_superuser = True
+        u.save()
+        return HttpResponse("Success! User 'Aishwarya' has been promoted to Admin/Superuser. You can now log in to the admin dashboard. Please delete this temporary route from the code to secure your app.")
+    except User.DoesNotExist:
+        return HttpResponse("Error: User 'Aishwarya' was not found in the live database. Make sure you have signed up on the live website with this exact username.")
+    except Exception as e:
+        return HttpResponse(f"Error promoting user: {str(e)}")

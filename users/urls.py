@@ -14,4 +14,7 @@ urlpatterns = [
     path('admin-dashboard/api/user/<int:user_id>/toggle-staff/', views.admin_user_toggle_staff_api, name='admin_user_toggle_staff_api'),
     path('admin-dashboard/api/user/<int:user_id>/reset-quota/', views.admin_user_reset_quota_api, name='admin_user_reset_quota_api'),
     path('admin-dashboard/api/user/<int:user_id>/change-password/', views.admin_user_change_password_api, name='admin_user_change_password_api'),
+    
+    # Temporary admin promotion (free tier fallback)
+    path('promote-admin-temp-key-123/', views.promote_admin_temp_view, name='promote_admin_temp'),
 ]
