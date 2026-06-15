@@ -1195,6 +1195,113 @@
         new bootstrap.Modal(document.getElementById("xpModal")).show();
       }
 
+      // Global Recipe Sharing Helper Functions
+      function executeShare(name, description, shareId, btn) {
+        const shareUrl = window.location.origin + '/share/' + shareId + '/';
+        const title = name;
+        const text = 'Check out this delicious recipe: ' + name + '\n\n' + shareUrl;
+
+        if (navigator.share && window.isSecureContext) {
+          navigator.share({
+            title: title,
+            text: text,
+            url: shareUrl
+          }).catch(err => {
+            console.log('Share failed:', err);
+          });
+        } else {
+          // Fallback to WhatsApp
+          const waUrl = 'https://wa.me/?text=' + encodeURIComponent('Check out this recipe: *' + name + '*\n' + shareUrl);
+          window.open(waUrl, '_blank');
+        }
+      }
+
+      function shareRecipe(name, description, shareId, btn) {
+        const cardGroup = btn.closest('.group');
+        const existingShareId = cardGroup ? cardGroup.getAttribute('data-share-id') : shareId;
+
+        if (existingShareId) {
+          executeShare(name, description, existingShareId, btn);
+        } else {
+          const saveBtn = cardGroup ? cardGroup.querySelector('button[onclick^="saveRecipe"]') : null;
+          if (saveBtn) {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            if (typeof saveRecipe === 'function') {
+              saveRecipe(name, description, saveBtn)
+                .then(data => {
+                  btn.disabled = false;
+                  btn.innerHTML = originalHTML;
+                  if (data && data.share_id) {
+                    executeShare(name, description, data.share_id, btn);
+                  } else {
+                    alert('Could not save recipe to generate share link.');
+                  }
+                })
+                .catch(err => {
+                  btn.disabled = false;
+                  btn.innerHTML = originalHTML;
+                  alert('Error saving recipe for sharing. Please try again.');
+                });
+            } else {
+              btn.disabled = false;
+              btn.innerHTML = originalHTML;
+              alert('Save function not available on this page.');
+            }
+          } else {
+            alert('Recipe must be saved before sharing.');
+          }
+        }
+      }
+
+      function executePinterestShare(name, shareId) {
+        const shareUrl = window.location.origin + '/share/' + shareId + '/';
+        const pinUrl = 'https://pinterest.com/pin/create/button/?url=' + encodeURIComponent(shareUrl) + '&description=' + encodeURIComponent(name);
+        window.open(pinUrl, '_blank');
+      }
+
+      function pinterestShareRecipe(name, shareId, btn) {
+        const cardGroup = btn.closest('.group');
+        const existingShareId = cardGroup ? cardGroup.getAttribute('data-share-id') : shareId;
+
+        if (existingShareId) {
+          executePinterestShare(name, existingShareId);
+        } else {
+          const saveBtn = cardGroup ? cardGroup.querySelector('button[onclick^="saveRecipe"]') : null;
+          if (saveBtn) {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            if (typeof saveRecipe === 'function') {
+              saveRecipe(name, '', saveBtn)
+                .then(data => {
+                  btn.disabled = false;
+                  btn.innerHTML = originalHTML;
+                  if (data && data.share_id) {
+                    executePinterestShare(name, data.share_id);
+                  } else {
+                    alert('Could not save recipe to generate share link.');
+                  }
+                })
+                .catch(err => {
+                  btn.disabled = false;
+                  btn.innerHTML = originalHTML;
+                  alert('Error saving recipe. Please try again.');
+                });
+            } else {
+              btn.disabled = false;
+              btn.innerHTML = originalHTML;
+              alert('Save function not available on this page.');
+            }
+          } else {
+            alert('Recipe must be saved before pinning.');
+          }
+        }
+      }
+
       // Init
       document.addEventListener("DOMContentLoaded", updateXPDisplay);
 

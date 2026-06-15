@@ -1404,18 +1404,26 @@
       formData.append('ai_response', '{{ ai_response|escapejs }}');
       formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-      fetch('/save-recipe/', { method: 'POST', body: formData })
+      return fetch('/save-recipe/', { method: 'POST', body: formData })
       .then(res => res.json())
       .then(data => {
+          const cardGroup = btn.closest('.group');
           if (data.status === 'saved') {
               btn.innerHTML = '❤️ Saved!';
               btn.style.background = 'linear-gradient(135deg,#d1fae5,#a7f3d0)';
               btn.style.color = '#065f46';
+              if (cardGroup && data.share_id) {
+                  cardGroup.setAttribute('data-share-id', data.share_id);
+              }
               // Gamification
               if(typeof addXP === 'function') addXP(10, "Saved a Recipe!");
           } else {
               btn.innerHTML = '✅ Already Saved';
+              if (cardGroup && data.share_id) {
+                  cardGroup.setAttribute('data-share-id', data.share_id);
+              }
           }
+          return data;
       });
   }
 
