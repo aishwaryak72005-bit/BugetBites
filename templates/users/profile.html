@@ -97,18 +97,20 @@
     const bodyEl = document.body;
     
     // Check current theme
-    const currentTheme = localStorage.getItem('theme');
+    const currentTheme = localStorage.getItem('theme') || 'dark';
     if (currentTheme === 'light') {
         themeToggle.checked = false;
         themeIcon.className = 'fas fa-sun';
         themeText.textContent = 'Light Mode';
         htmlEl.setAttribute('data-bs-theme', 'light');
+        htmlEl.classList.remove('dark-mode');
         bodyEl.classList.add('light-mode');
     } else {
         themeToggle.checked = true;
         themeIcon.className = 'fas fa-moon';
         themeText.textContent = 'Dark Mode';
         htmlEl.setAttribute('data-bs-theme', 'dark');
+        htmlEl.classList.add('dark-mode');
         bodyEl.classList.remove('light-mode');
     }
 

@@ -1,0 +1,704 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  /* Custom styles for Admin Dashboard */
+  .admin-stat-card {
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  .admin-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  }
+  .admin-table-container {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
+  }
+  .table th {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    background: rgba(0, 0, 0, 0.02);
+    padding: 16px;
+    color: #475569;
+  }
+  .table td {
+    padding: 16px;
+    vertical-align: middle;
+    color: #1E293B;
+  }
+  .user-avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669, #10B981);
+    color: white;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+  }
+  .badge-active {
+    background: #DCFCE7;
+    color: #15803D;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 12px;
+  }
+  .badge-blocked {
+    background: #FEE2E2;
+    color: #991B1B;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 12px;
+  }
+  .badge-role-admin {
+    background: #F3E8FF;
+    color: #6B21A8;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 12px;
+  }
+  .badge-role-user {
+    background: #F1F5F9;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 12px;
+  }
+  
+  /* Form custom controls */
+  .search-input-group {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .search-input-group input {
+    border: none;
+    padding: 12px 18px;
+    font-size: 0.92rem;
+  }
+  .search-input-group button {
+    background: #059669;
+    color: white;
+    border: none;
+    padding: 0 24px;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  .search-input-group button:hover {
+    background: #16A34A;
+  }
+  
+  .sort-select {
+    border-radius: 14px;
+    padding: 12px 20px;
+    font-size: 0.92rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  /* Dark Mode Styles */
+  .dark-mode .admin-stat-card {
+    background: #1F2937 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  .dark-mode .admin-stat-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+  .dark-mode .admin-table-container {
+    background: #1F2937 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+  .dark-mode .table th {
+    background: rgba(255, 255, 255, 0.02) !important;
+    color: #9CA3AF !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+  .dark-mode .table td {
+    color: #E5E7EB !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  }
+  .dark-mode .search-input-group {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+  .dark-mode .search-input-group input {
+    background: #374151 !important;
+    color: #F9FAFB !important;
+  }
+  .dark-mode .sort-select {
+    background: #374151 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #F9FAFB !important;
+  }
+  .dark-mode .badge-role-user {
+    background: #374151;
+    color: #D1D5DB;
+  }
+  .dark-mode .badge-active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34D399;
+  }
+  .dark-mode .badge-blocked {
+    background: rgba(239, 68, 68, 0.15);
+    color: #F87171;
+  }
+  .dark-mode .badge-role-admin {
+    background: rgba(139, 92, 246, 0.15);
+    color: #C084FC;
+  }
+  
+  /* Details Modal Custom styles */
+  .detail-recipe-item {
+    padding: 12px;
+    border-radius: 12px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+  }
+  .dark-mode .detail-recipe-item {
+    background: #374151;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  
+  /* Toast Notification */
+  .admin-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
+    background: #1F2937;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
+
+<div class="row justify-content-center mt-2">
+  <div class="col-lg-12">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold mb-1">Admin Dashboard</h3>
+        <p class="text-muted mb-0">System metrics and user accounts management panel</p>
+      </div>
+      <a href="{% url 'home' %}" class="btn hero-btn-secondary" style="border-radius: 12px; padding: 8px 16px;">
+        <i class="fas fa-arrow-left me-1"></i> Home
+      </a>
+    </div>
+
+    <!-- Aggregated Metrics Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="card p-4 admin-stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1" style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Total Users</p>
+              <h3 class="fw-bold mb-0">{{ total_users }}</h3>
+            </div>
+            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: rgba(5, 150, 105, 0.1); color: #059669; font-size: 1.3rem;">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card p-4 admin-stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1" style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Active (30D)</p>
+              <h3 class="fw-bold mb-0">{{ active_users }}</h3>
+            </div>
+            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: rgba(245, 158, 11, 0.1); color: #F59E0B; font-size: 1.3rem;">
+              <i class="fas fa-user-clock"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card p-4 admin-stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1" style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Admins/Staff</p>
+              <h3 class="fw-bold mb-0">{{ staff_count }}</h3>
+            </div>
+            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: rgba(139, 92, 246, 0.1); color: #8B5CF6; font-size: 1.3rem;">
+              <i class="fas fa-user-shield"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="card p-4 admin-stat-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1" style="font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Saved Recipes</p>
+              <h3 class="fw-bold mb-0">{{ total_saved_recipes }}</h3>
+            </div>
+            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.1); color: #10B981; font-size: 1.3rem;">
+              <i class="fas fa-heart"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Extra stat row: AI Runs Today -->
+    <div class="alert alert-success d-flex align-items-center mb-4 p-3" style="border-radius: 16px;">
+      <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; background: #059669; color: white;">
+        <i class="fas fa-magic"></i>
+      </div>
+      <div>
+        <h6 class="mb-0 fw-bold">Daily Activity Run log</h6>
+        <p class="mb-0 text-muted" style="font-size: 0.82rem;">System has generated <strong>{{ generations_today }}</strong> AI recipes globally today.</p>
+      </div>
+    </div>
+
+    <!-- Control Bar (Search & Sort) -->
+    <form method="GET" class="row g-3 mb-4 align-items-center">
+      <div class="col-md-7">
+        <div class="input-group search-input-group">
+          <span class="input-group-text border-0 bg-transparent ps-3"><i class="fas fa-search text-muted"></i></span>
+          <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search users by username or email...">
+          <button type="submit" class="btn text-white">Search</button>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select name="sort" class="form-select sort-select" onchange="this.form.submit()">
+          <option value="-date_joined" {% if sort_by == '-date_joined' %}selected{% endif %}>Joined: Newest First</option>
+          <option value="date_joined" {% if sort_by == 'date_joined' %}selected{% endif %}>Joined: Oldest First</option>
+          <option value="username" {% if sort_by == 'username' %}selected{% endif %}>Username: A-Z</option>
+          <option value="-username" {% if sort_by == '-username' %}selected{% endif %}>Username: Z-A</option>
+          <option value="-last_login" {% if sort_by == '-last_login' %}selected{% endif %}>Last Login: Recent First</option>
+          <option value="last_login" {% if sort_by == 'last_login' %}selected{% endif %}>Last Login: Oldest First</option>
+        </select>
+      </div>
+      {% if query %}
+      <div class="col-md-2">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary w-100" style="border-radius: 14px; padding: 11px 16px;">Clear Filter</a>
+      </div>
+      {% endif %}
+    </form>
+
+    <!-- Users Table -->
+    <div class="admin-table-container">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Joined Date</th>
+              <th>Last Login</th>
+              <th class="text-center">Saved Recipes</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in page_obj %}
+            <tr id="user-row-{{ u.id }}">
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="user-avatar-circle me-3">
+                    {{ u.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                    <span class="fw-bold d-block" style="font-size: 0.95rem;">{{ u.username }}</span>
+                    {% if u.is_superuser %}
+                    <span class="text-warning fw-bold" style="font-size: 0.72rem; letter-spacing: 0.3px; text-transform: uppercase;">Superuser</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span style="font-size: 0.9rem;">{{ u.email|default:"No email provided" }}</span>
+              </td>
+              <td class="text-muted" style="font-size: 0.88rem;">{{ u.date_joined|date:"Y-m-d H:i" }}</td>
+              <td class="text-muted" style="font-size: 0.88rem;">{{ u.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
+              <td class="text-center">
+                <span class="badge bg-secondary rounded-pill" style="font-size: 0.8rem; padding: 4px 10px;">{{ u.saved_recipes_count }}</span>
+              </td>
+              <td>
+                <span class="role-badge badge-role-{% if u.is_staff %}admin{% else %}user{% endif %}" id="role-badge-{{ u.id }}">
+                  {% if u.is_staff %}Admin{% else %}User{% endif %}
+                </span>
+              </td>
+              <td>
+                <span class="status-badge badge-{% if u.is_active %}active{% else %}blocked{% endif %}" id="status-badge-{{ u.id }}">
+                  {% if u.is_active %}Active{% else %}Blocked{% endif %}
+                </span>
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <button type="button" class="btn btn-sm btn-outline-success" onclick="openUserDetail({{ u.id }})" style="border-radius: 8px; padding: 6px 12px; font-weight:600;">
+                    <i class="fas fa-edit me-1"></i> Manage
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center p-5 text-muted">
+                <i class="fas fa-user-slash fa-3x mb-3 text-muted"></i>
+                <p class="mb-0 fw-bold" style="font-size: 1.1rem;">No users found matching your search</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages %}
+      <div class="d-flex justify-content-between align-items-center p-4 border-top" style="background: rgba(0,0,0,0.01);">
+        <span class="text-muted" style="font-size: 0.88rem;">
+          Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} users
+        </span>
+        <nav aria-label="Page navigation">
+          <ul class="pagination mb-0" style="gap: 4px;">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link border-0 rounded" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" style="color:#059669; padding: 8px 14px;"><i class="fas fa-chevron-left"></i></a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link border-0 rounded text-white" style="background:#059669; border-color:#059669; padding: 8px 14px; font-weight:700;">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link border-0 rounded text-muted" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" style="padding: 8px 14px;">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link border-0 rounded" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" style="color:#059669; padding: 8px 14px;"><i class="fas fa-chevron-right"></i></a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Slide-out Drawer Modal -->
+<div class="modal fade" id="userDetailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 24px; border: none; overflow: hidden;">
+      <div class="modal-header px-4 py-3" style="background: linear-gradient(135deg, #1F2937, #111827); color: white; border: none;">
+        <div>
+          <h5 class="modal-title fw-bold text-white" id="detailUsername">User Details</h5>
+          <span style="font-size: 0.78rem; opacity: 0.8;" id="detailUserJoined">Joined 2026-06-15</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row g-4">
+          <!-- Left side: User Overview & Actions -->
+          <div class="col-md-6 border-end">
+            <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-1"></i> Account Details</h6>
+            
+            <div style="background: rgba(0,0,0,0.02); padding: 16px; border-radius: 16px; margin-bottom: 20px;" id="detailMetaCard">
+              <div class="mb-2">
+                <span class="text-muted d-block" style="font-size: 0.78rem;">Email Address</span>
+                <strong style="font-size: 0.9rem;" id="detailEmail">email@example.com</strong>
+              </div>
+              <div class="mb-2">
+                <span class="text-muted d-block" style="font-size: 0.78rem;">Last Login Session</span>
+                <strong style="font-size: 0.9rem;" id="detailLastLogin">Never</strong>
+              </div>
+              <div>
+                <span class="text-muted d-block" style="font-size: 0.78rem;">Daily AI Recipes Runs Today</span>
+                <div class="d-flex align-items-center justify-content-between mt-1">
+                  <strong style="font-size: 0.9rem;" id="detailQuota">0 / 5 limit</strong>
+                  <button type="button" class="btn btn-sm btn-outline-warning" id="btnResetQuota" style="border-radius: 8px; font-size: 0.75rem; font-weight:700;">
+                    Reset Today's Quota
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <h6 class="fw-bold mb-3"><i class="fas fa-sliders-h me-1"></i> Management Controls</h6>
+            <div class="d-flex flex-column gap-3 mb-4">
+              <button type="button" class="btn w-100 py-3 text-start d-flex justify-content-between align-items-center" id="btnToggleActive" style="border-radius: 14px; font-weight: 700; border: 1px solid rgba(0,0,0,0.08);">
+                <span>
+                  <i class="fas fa-ban me-2 text-danger"></i> 
+                  <span id="activeBtnText">Deactivate Account</span>
+                </span>
+                <i class="fas fa-chevron-right text-muted"></i>
+              </button>
+
+              <button type="button" class="btn w-100 py-3 text-start d-flex justify-content-between align-items-center" id="btnToggleStaff" style="border-radius: 14px; font-weight: 700; border: 1px solid rgba(0,0,0,0.08);">
+                <span>
+                  <i class="fas fa-shield-alt me-2 text-purple" style="color:#8B5CF6;"></i> 
+                  <span id="staffBtnText">Grant Admin Privileges</span>
+                </span>
+                <i class="fas fa-chevron-right text-muted"></i>
+              </button>
+            </div>
+
+            <h6 class="fw-bold mb-3"><i class="fas fa-key me-1"></i> Change Password</h6>
+            <form id="changePasswordForm">
+              <div class="input-group search-input-group mb-2" style="border-radius: 10px;">
+                <input type="text" id="newPassword" class="form-control" placeholder="Enter new password (min 6 chars)..." required>
+                <button type="submit" class="btn text-white">Update</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right side: Saved Recipes List -->
+          <div class="col-md-6">
+            <h6 class="fw-bold mb-3"><i class="fas fa-heart me-1"></i> Saved Recipes (<span id="detailRecipesCount">0</span>)</h6>
+            <div id="detailRecipesList" style="max-height: 340px; overflow-y: auto; padding-right: 4px;">
+              <!-- Dynamic content goes here -->
+              <p class="text-muted text-center py-4">No saved recipes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Toast Notification -->
+<div class="admin-toast" id="adminToast">
+  <span id="toastIcon">✨</span>
+  <span id="toastMessage">Action completed successfully.</span>
+</div>
+
+<script>
+  let activeUserId = null;
+  const userModal = new bootstrap.Modal(document.getElementById('userDetailModal'));
+
+  // Open user details and fetch statistics
+  function openUserDetail(userId) {
+    activeUserId = userId;
+    
+    // Reset modal UI to loading state
+    document.getElementById('detailUsername').textContent = 'Loading user...';
+    document.getElementById('detailUserJoined').textContent = 'Fetching details...';
+    document.getElementById('detailEmail').textContent = 'Loading...';
+    document.getElementById('detailLastLogin').textContent = 'Loading...';
+    document.getElementById('detailQuota').textContent = 'Loading...';
+    document.getElementById('detailRecipesCount').textContent = '0';
+    document.getElementById('detailRecipesList').innerHTML = `<p class="text-muted text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading recipes...</p>`;
+    
+    // Reset action buttons to generic loading
+    const activeBtn = document.getElementById('btnToggleActive');
+    const staffBtn = document.getElementById('btnToggleStaff');
+    activeBtn.className = 'btn w-100 py-3 text-start d-flex justify-content-between align-items-center';
+    staffBtn.className = 'btn w-100 py-3 text-start d-flex justify-content-between align-items-center';
+
+    userModal.show();
+
+    // Fetch user details
+    fetch(`/admin-dashboard/api/user/${userId}/detail/`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load details');
+        return res.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          const user = data.data;
+          
+          document.getElementById('detailUsername').textContent = user.username;
+          document.getElementById('detailUserJoined').textContent = `Joined ${user.date_joined}`;
+          document.getElementById('detailEmail').textContent = user.email;
+          document.getElementById('detailLastLogin').textContent = user.last_login;
+          document.getElementById('detailQuota').textContent = `${user.quota_count} / ${user.quota_limit} generations used`;
+          document.getElementById('detailRecipesCount').textContent = user.saved_recipes_count;
+          
+          // Render saved recipes list
+          const recipeContainer = document.getElementById('detailRecipesList');
+          if (user.recipes && user.recipes.length > 0) {
+            recipeContainer.innerHTML = '';
+            user.recipes.forEach(r => {
+              recipeContainer.innerHTML += `
+                <div class="detail-recipe-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong style="font-size: 0.9rem;">${r.name}</strong>
+                    <span class="badge bg-success rounded-pill" style="font-size: 0.72rem;">${r.cuisine}</span>
+                  </div>
+                  <span class="text-muted d-block mt-1" style="font-size: 0.75rem;"><i class="far fa-clock me-1"></i>Saved: ${r.created_at}</span>
+                </div>
+              `;
+            });
+          } else {
+            recipeContainer.innerHTML = `<p class="text-muted text-center py-4">This user has not saved any recipes yet.</p>`;
+          }
+
+          // Style and text of Status Toggle
+          const activeText = document.getElementById('activeBtnText');
+          if (user.is_active) {
+            activeText.textContent = 'Deactivate / Lock Account';
+            activeBtn.classList.add('btn-outline-danger');
+          } else {
+            activeText.textContent = 'Reactivate User Account';
+            activeBtn.classList.add('btn-success');
+            activeBtn.classList.add('text-white');
+          }
+
+          // Style and text of Staff Toggle
+          const staffText = document.getElementById('staffBtnText');
+          if (user.is_staff) {
+            staffText.textContent = 'Revoke Admin Privileges';
+            staffBtn.classList.add('btn-outline-warning');
+          } else {
+            staffText.textContent = 'Grant Admin Privileges';
+            staffBtn.style.cssText = 'border-color: #8B5CF6; color: #8B5CF6;';
+          }
+        }
+      })
+      .catch(err => {
+        showToast('❌ Failed to fetch user details. Please try again.', 'error');
+        userModal.hide();
+      });
+  }
+
+  // Helper to trigger AJAX actions
+  function triggerUserAction(url, bodyData = {}) {
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify(bodyData)
+    }).then(res => res.json());
+  }
+
+  // Hook Status Toggle action
+  document.getElementById('btnToggleActive').addEventListener('click', function() {
+    if (!activeUserId) return;
+    
+    triggerUserAction(`/admin-dashboard/api/user/${activeUserId}/toggle-active/`)
+      .then(res => {
+        if (res.status === 'success') {
+          showToast(`🛡️ ${res.message}`, 'success');
+          
+          // Update table row badges
+          const rowBadge = document.getElementById(`status-badge-${activeUserId}`);
+          if (res.is_active) {
+            rowBadge.textContent = 'Active';
+            rowBadge.className = 'status-badge badge-active';
+          } else {
+            rowBadge.textContent = 'Blocked';
+            rowBadge.className = 'status-badge badge-blocked';
+          }
+          
+          // Close and refresh
+          userModal.hide();
+        } else {
+          showToast(`❌ ${res.message}`, 'error');
+        }
+      })
+      .catch(() => showToast('❌ Error executing status action.', 'error'));
+  });
+
+  // Hook Staff Toggle action
+  document.getElementById('btnToggleStaff').addEventListener('click', function() {
+    if (!activeUserId) return;
+    
+    triggerUserAction(`/admin-dashboard/api/user/${activeUserId}/toggle-staff/`)
+      .then(res => {
+        if (res.status === 'success') {
+          showToast(`👑 ${res.message}`, 'success');
+          
+          // Update table row badges
+          const rowRole = document.getElementById(`role-badge-${activeUserId}`);
+          if (res.is_staff) {
+            rowRole.textContent = 'Admin';
+            rowRole.className = 'role-badge badge-role-admin';
+          } else {
+            rowRole.textContent = 'User';
+            rowRole.className = 'role-badge badge-role-user';
+          }
+          
+          userModal.hide();
+        } else {
+          showToast(`❌ ${res.message}`, 'error');
+        }
+      })
+      .catch(() => showToast('❌ Error executing role privilege action.', 'error'));
+  });
+
+  // Hook Quota Reset action
+  document.getElementById('btnResetQuota').addEventListener('click', function() {
+    if (!activeUserId) return;
+    
+    triggerUserAction(`/admin-dashboard/api/user/${activeUserId}/reset-quota/`)
+      .then(res => {
+        if (res.status === 'success') {
+          showToast(`⚡ ${res.message}`, 'success');
+          document.getElementById('detailQuota').textContent = '0 / 5 generations used';
+        } else {
+          showToast(`❌ ${res.message}`, 'error');
+        }
+      })
+      .catch(() => showToast('❌ Error resetting daily request limit.', 'error'));
+  });
+
+  // Hook Password Change form
+  document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!activeUserId) return;
+    
+    const newPwd = document.getElementById('newPassword').value;
+    triggerUserAction(`/admin-dashboard/api/user/${activeUserId}/change-password/`, { new_password: newPwd })
+      .then(res => {
+        if (res.status === 'success') {
+          showToast(`🔑 ${res.message}`, 'success');
+          document.getElementById('newPassword').value = '';
+          userModal.hide();
+        } else {
+          showToast(`❌ ${res.message}`, 'error');
+        }
+      })
+      .catch(() => showToast('❌ Error updating password.', 'error'));
+  });
+
+  // Toast notifier
+  function showToast(message, type) {
+    const toast = document.getElementById('adminToast');
+    const msgEl = document.getElementById('toastMessage');
+    const iconEl = document.getElementById('toastIcon');
+    
+    msgEl.textContent = message;
+    iconEl.textContent = type === 'error' ? '⚠️' : '✅';
+    
+    toast.style.display = 'flex';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 4000);
+  }
+</script>
+{% endblock %}

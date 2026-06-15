@@ -50,3 +50,94 @@ class UserAuthTests(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Invalid username or password.')
+
+
+class AdminDashboardTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin_url = reverse('admin_dashboard')
+        
+        # Create a regular user
+        self.regular_user = User.objects.create_user(
+            username='regularuser',
+            password='testpassword123'
+        )
+        
+        # Create a staff/admin user
+        self.staff_user = User.objects.create_user(
+            username='staffuser',
+            password='testpassword123',
+            is_staff=True
+        )
+        
+    def test_guest_cannot_access_dashboard(self):
+        # Guests should be redirected to login page (staff login view)
+        response = self.client.get(self.admin_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue('login' in response.url)
+        
+    def test_regular_user_cannot_access_dashboard(self):
+        # Authenticated non-staff users should also be redirected/blocked
+        self.client.login(username='regularuser', password='testpassword123')
+        response = self.client.get(self.admin_url)
+        self.assertEqual(response.status_code, 302)
+        
+    def test_staff_user_can_access_dashboard(self):
+        # Staff user should get 200 OK
+        self.client.login(username='staffuser', password='testpassword123')
+        response = self.client.get(self.admin_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'users/admin_dashboard.html')
+        
+    def test_toggle_user_active_status(self):
+        self.client.login(username='staffuser', password='testpassword123')
+        
+        # Verify initial status
+        self.assertTrue(self.regular_user.is_active)
+        
+        # Call toggle active API
+        toggle_url = reverse('admin_user_toggle_active_api', args=[self.regular_user.id])
+        response = self.client.post(toggle_url)
+        
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        self.assertEqual(json_data['status'], 'success')
+        self.assertFalse(json_data['is_active'])
+        
+        # Verify database is updated
+        self.regular_user.refresh_from_db()
+        self.assertFalse(self.regular_user.is_active)
+        
+    def test_toggle_user_staff_status(self):
+        self.client.login(username='staffuser', password='testpassword123')
+        
+        # Verify initial status
+        self.assertFalse(self.regular_user.is_staff)
+        
+        # Call toggle staff API
+        toggle_url = reverse('admin_user_toggle_staff_api', args=[self.regular_user.id])
+        response = self.client.post(toggle_url)
+        
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        self.assertEqual(json_data['status'], 'success')
+        self.assertTrue(json_data['is_staff'])
+        
+        # Verify database is updated
+        self.regular_user.refresh_from_db()
+        self.assertTrue(self.regular_user.is_staff)
+
+    def test_change_user_password(self):
+        self.client.login(username='staffuser', password='testpassword123')
+        
+        # Call password change API
+        change_pwd_url = reverse('admin_user_change_password_api', args=[self.regular_user.id])
+        response = self.client.post(change_pwd_url, data='{"new_password": "newsecurepassword123"}', content_type='application/json')
+        
+        self.assertEqual(response.status_code, 200)
+        json_data = response.json()
+        self.assertEqual(json_data['status'], 'success')
+        
+        # Verify password is changed by trying to log in with new password
+        login_success = self.client.login(username='regularuser', password='newsecurepassword123')
+        self.assertTrue(login_success)

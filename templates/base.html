@@ -24,23 +24,23 @@
         font-family: "Poppins", sans-serif;
         box-sizing: border-box;
       }
-      /* Dark Theme (Default) */
+      /* Light Theme (Default) */
       body {
-        background: #111827; 
+        background: #F8FAFC; 
         min-height: 100vh;
         padding-top: 80px;
-        color: #F8FAFC;
+        color: #1E293B;
       }
       .navbar {
-        background: rgba(17, 24, 39, 0.95) !important;
+        background: rgba(255, 255, 255, 0.95) !important;
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         padding: 10px 0;
       }
       .navbar-brand {
-        color: #F8FAFC !important;
+        color: #0F172A !important;
         font-size: 1.5rem;
         font-weight: 800;
         letter-spacing: -0.5px;
@@ -49,7 +49,7 @@
         color: #22C55E;
       }
       .nav-link {
-        color: rgba(255, 255, 255, 0.8) !important;
+        color: rgba(15, 23, 42, 0.8) !important;
         font-weight: 600;
         padding: 8px 16px !important;
         border-radius: 20px;
@@ -57,50 +57,8 @@
         font-size: 0.95rem;
       }
       .nav-link:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: #FFFFFF !important;
-      }
-
-      /* Light Theme Overrides */
-      @media (prefers-color-scheme: light) {
-        body {
-          background: #F8FAFC; 
-          color: #1E293B;
-        }
-        .navbar {
-          background: rgba(255, 255, 255, 0.95) !important;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        .navbar-brand {
-          color: #0F172A !important;
-        }
-        .nav-link {
-          color: rgba(15, 23, 42, 0.8) !important;
-        }
-        .nav-link:hover {
-          background: rgba(0, 0, 0, 0.05);
-          color: #000000 !important;
-        }
-        .footer {
-          background: #F1F5F9;
-          color: #475569;
-          border-top: 3px solid rgba(16, 185, 129, 0.2);
-        }
-        .mobile-bottom-nav {
-          background: rgba(255, 255, 255, 0.96);
-          border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        .mobile-nav-item.active {
-          color: #059669;
-        }
-        .navbar-collapse {
-          background: #FFFFFF !important;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
-        }
-        .navbar-collapse .nav-link {
-          color: #1E293B !important;
-          background: rgba(0, 0, 0, 0.03) !important;
-        }
+        background: rgba(0, 0, 0, 0.05);
+        color: #000000 !important;
       }
       .nav-btn-white {
         background: #22C55E !important;
@@ -310,7 +268,7 @@
         background: rgba(255, 255, 255, 0.96);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        border-top: 1px solid rgba(6, 78, 59, 0.1);
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
         box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
         z-index: 1000;
         padding-bottom: env(safe-area-inset-bottom);
@@ -319,7 +277,7 @@
         flex: 1;
         text-align: center;
         padding: 12px 0;
-        color: #9ca3af;
+        color: #64748B;
         text-decoration: none;
         font-size: 0.75rem;
         font-weight: 600;
@@ -334,7 +292,7 @@
         color: #059669;
       }
       .mobile-nav-item:hover {
-        color: #1F2937;
+        color: #0F172A;
       }
 
       @media (max-width: 991px) {
@@ -345,23 +303,23 @@
           padding-bottom: 80px;
         }
         .navbar-collapse {
-          background: #1F2937;
+          background: #FFFFFF;
           padding: 15px;
           border-radius: 12px;
           margin-top: 10px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         .navbar-collapse .nav-link {
-          color: rgba(248, 249, 250, 0.88) !important;
+          color: #1E293B !important;
           padding: 12px 16px !important;
           margin-bottom: 8px;
           border-radius: 12px;
-          background: rgba(248, 249, 250, 0.08);
+          background: rgba(0, 0, 0, 0.03);
           font-weight: 600;
         }
         .navbar-collapse .nav-user-badge {
-          background: rgba(16, 185, 129, 0.2) !important;
-          color: #FFFFFF !important;
+          background: rgba(16, 185, 129, 0.1) !important;
+          color: #059669 !important;
           margin-top: 8px;
           margin-bottom: 8px;
         }
@@ -497,22 +455,23 @@
       }
       .dark-mode .navbar {
         background: #1F2937 !important;
-        border-bottom: 1px solid #374151;
+        border-bottom: 1px solid #374151 !important;
         box-shadow: none !important;
       }
-      .dark-mode .navbar-brand span {
-        color: #F9FAFB !important;
+      .dark-mode .navbar-brand {
+        color: #F8FAFC !important;
       }
       .dark-mode .nav-link {
         color: #D1D5DB !important;
       }
       .dark-mode .nav-link:hover {
         color: #10B981 !important;
-        background: rgba(16, 185, 129, 0.1);
+        background: rgba(16, 185, 129, 0.1) !important;
       }
       .dark-mode .nav-user-badge {
         color: #10B981 !important;
-        border-color: #10B981;
+        border-color: #10B981 !important;
+        background: rgba(16, 185, 129, 0.1) !important;
       }
       .dark-mode .card {
         background: #1F2937 !important;
@@ -526,13 +485,6 @@
       }
       .dark-mode .text-muted {
         color: #9CA3AF !important;
-      }
-      /* Keep white cards text dark so it's readable */
-      .dark-mode .food-card h6, .dark-mode .step-card h6 {
-        color: #1F2937 !important;
-      }
-      .dark-mode .food-card p, .dark-mode .step-card p {
-        color: #4B5563 !important;
       }
       .dark-mode hr {
         border-color: #374151 !important;
@@ -567,6 +519,26 @@
         color: #A7F3D0 !important;
         border: 1px solid rgba(16, 185, 129, 0.3) !important;
       }
+      .dark-mode .mobile-bottom-nav {
+        background: rgba(31, 41, 55, 0.96) !important;
+        border-top: 1px solid #374151 !important;
+      }
+      .dark-mode .mobile-nav-item {
+        color: #9CA3AF !important;
+      }
+      .dark-mode .mobile-nav-item.active {
+        color: #10B981 !important;
+      }
+      @media (max-width: 991px) {
+        .dark-mode .navbar-collapse {
+          background: #1F2937 !important;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+        }
+        .dark-mode .navbar-collapse .nav-link {
+          color: rgba(248, 249, 250, 0.88) !important;
+          background: rgba(248, 249, 250, 0.08) !important;
+        }
+      }
     </style>
     <!-- Web App Manifest -->
     <link rel="manifest" href="/manifest.json">
@@ -575,8 +547,13 @@
     
     <script>
       // Immediately apply theme before rendering to prevent white flash
-      if (localStorage.getItem('theme') === 'dark') {
+      const theme = localStorage.getItem('theme') || 'dark';
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark-mode');
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+      } else {
         document.documentElement.classList.add('dark-mode');
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
       }
       // Register PWA Service Worker
       if ('serviceWorker' in navigator) {
@@ -638,6 +615,12 @@
               <i class="fas fa-star text-white"></i>
               <span id="userXPDisplay">0 XP</span>
             </div>
+
+            {% if user.is_staff %}
+            <a class="nav-link text-white me-1" href="{% url 'admin_dashboard' %}">
+              <i class="fas fa-user-shield me-1"></i> Admin
+            </a>
+            {% endif %}
 
             <a class="nav-link nav-user-badge ms-2 text-white" href="{% url 'profile' %}">
               <i class="fas fa-user-circle me-1"></i> {{ user.username }}
