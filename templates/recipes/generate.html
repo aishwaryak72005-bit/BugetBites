@@ -1530,8 +1530,8 @@
                     url: shareUrl,
                 }).catch(() => {});
             } else {
-                // Fallback: Force open native WhatsApp app instead of the web browser
-                window.location.href = 'whatsapp://send?text=' + encodeURIComponent(shareText);
+                // Fallback: Try Android's strict intent scheme which works better in WebViews
+                window.location.href = 'intent://send?text=' + encodeURIComponent(shareText) + '#Intent;scheme=whatsapp;package=com.whatsapp;end';
             }
 
             btn.innerHTML = '✅ Shared!';
