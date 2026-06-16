@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         myWebView.webViewClient = WebViewClient()
 
         // Loads your Render live web app
-        myWebView.loadUrl("https://smartrecipe-okjh.onrender.com")
+        myWebView.loadUrl("https://bugetbites.onrender.com")
 
         // Handle back button navigation inside WebView
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {

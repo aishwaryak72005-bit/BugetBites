@@ -20,4 +20,4 @@ Disallow: /meal-planner/delete/
 Disallow: /static/
 
 # Sitemap location
-Sitemap: https://smartrecipe-okjh.onrender.com/sitemap.xml
+Sitemap: https://bugetbites.onrender.com/sitemap.xml

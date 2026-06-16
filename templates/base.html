@@ -26,60 +26,44 @@
     <meta name="robots" content="index, follow" />
 
     <!-- Canonical URL (prevents duplicate content issues) -->
-    <link rel="canonical" href="https://smartrecipe-okjh.onrender.com{{ request.path }}" />
-
-    <!-- Open Graph Tags (Facebook, WhatsApp, Instagram previews) -->
+    <link rel="canonical" href="https://bugetbites.onrender.com{{ request.path }}" />
+    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="BudgetBites" />
-    <meta property="og:title" content="BudgetBites – AI Recipe Generator for Indian Kitchens 🍛" />
-    <meta property="og:description" content="Get budget-friendly Indian recipes powered by AI. Enter your ingredients, set your budget in ₹, and get delicious meal ideas instantly. Free meal planner, grocery lists & more!" />
-    <meta property="og:url" content="https://smartrecipe-okjh.onrender.com{{ request.path }}" />
-    <meta property="og:image" content="https://smartrecipe-okjh.onrender.com{% static 'logo.png' %}" />
-    <meta property="og:image:width" content="512" />
-    <meta property="og:image:height" content="512" />
-    <meta property="og:locale" content="en_IN" />
+    <meta property="og:url" content="https://bugetbites.onrender.com{{ request.path }}" />
+    <meta property="og:title" content="BudgetBites - AI Recipe Generator & Meal Planner" />
+    <meta property="og:description" content="Generate delicious, budget-friendly recipes instantly with AI." />
+    <meta property="og:image" content="https://bugetbites.onrender.com{% static 'logo.png' %}" />
 
-    <!-- Twitter Card Tags -->
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="BudgetBites – AI Recipe Generator for Indian Kitchens 🍛" />
-    <meta name="twitter:description" content="Budget-friendly Indian recipes powered by AI. Enter your ingredients, set your ₹ budget, get delicious meal ideas instantly!" />
-    <meta name="twitter:image" content="https://smartrecipe-okjh.onrender.com{% static 'logo.png' %}" />
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://bugetbites.onrender.com{{ request.path }}" />
+    <meta property="twitter:title" content="BudgetBites - AI Recipe Generator & Meal Planner" />
+    <meta property="twitter:description" content="Generate delicious, budget-friendly recipes instantly with AI." />
+    <meta name="twitter:image" content="https://bugetbites.onrender.com{% static 'logo.png' %}" />
 
-    <!-- Structured Data: WebSite (enables Google Sitelinks & Search Box) -->
+    <!-- Schema.org Markup -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "BudgetBites",
-      "alternateName": ["Budget Bites", "SmartRecipe", "BudgetBites India"],
-      "url": "https://smartrecipe-okjh.onrender.com",
-      "description": "Free AI-powered recipe generator for Indian kitchens. Budget-friendly meals, meal planner, grocery lists and more.",
-      "inLanguage": "en-IN",
+      "url": "https://bugetbites.onrender.com",
       "potentialAction": {
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "https://smartrecipe-okjh.onrender.com/generate/?ingredients={search_term_string}"
+          "urlTemplate": "https://bugetbites.onrender.com/generate/?ingredients={search_term_string}"
         },
         "query-input": "required name=search_term_string"
       }
     }
     </script>
-
-    <!-- Structured Data: Organization -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "BudgetBites",
-      "url": "https://smartrecipe-okjh.onrender.com",
-      "logo": "https://smartrecipe-okjh.onrender.com{% static 'logo.png' %}",
-      "description": "AI-powered budget recipe generator for Indian kitchens",
-      "foundingDate": "2024",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "customer support",
-        "availableLanguage": ["English", "Hindi"]
       }
     }
     </script>
