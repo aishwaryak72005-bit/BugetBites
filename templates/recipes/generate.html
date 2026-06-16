@@ -2504,23 +2504,11 @@ function downloadPDF(recipeId, recipeName) {
     html2pdf().set(opt).from(clone).save();
 }
 
-function logMacros(recipeName, description, btnElement) {
-    // Attempt to extract calories, protein, carbs, fats using Regex from description or AI text
-    // E.g. "Calories: 450 kcal | Protein: 30g"
-    let cals = 0, p = 0, c = 0, f = 0;
-    const text = document.body.innerText; // Rough search in whole page context for this recipe
-    
-    const calMatch = text.match(/Calories:?\s*(\d+)/i);
-    if(calMatch) cals = parseInt(calMatch[1]);
-    
-    const pMatch = text.match(/Protein:?\s*(\d+)/i);
-    if(pMatch) p = parseInt(pMatch[1]);
-    
-    const cMatch = text.match(/Carbs:?\s*(\d+)/i);
-    if(cMatch) c = parseInt(cMatch[1]);
-    
-    const fMatch = text.match(/Fat:?\s*(\d+)/i) || text.match(/Fats:?\s*(\d+)/i);
-    if(fMatch) f = parseInt(fMatch[1]);
+function logMacros(recipeName, calories, protein, carbs, fats, btnElement) {
+    let cals = parseInt(calories) || 0;
+    let p = parseInt(protein) || 0;
+    let c = parseInt(carbs) || 0;
+    let f = parseInt(fats) || 0;
     
     // Send to API
     fetch('/api/macros/log/', {
