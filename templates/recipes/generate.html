@@ -1530,8 +1530,8 @@
                     url: shareUrl,
                 }).catch(() => {});
             } else {
-                // Fallback: open WhatsApp via api.whatsapp.com (works in WebView)
-                window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(shareText), '_blank');
+                // Fallback: Force open native WhatsApp app instead of the web browser
+                window.location.href = 'whatsapp://send?text=' + encodeURIComponent(shareText);
             }
 
             btn.innerHTML = '✅ Shared!';
