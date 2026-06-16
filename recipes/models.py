@@ -81,6 +81,27 @@ class MacroLog(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.recipe_name} ({self.calories} kcal)"
 
+class RecipeHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipe_history')
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    ingredients_used = models.TextField(blank=True)  # JSON string
+    budget = models.CharField(max_length=50, blank=True)
+    cuisine = models.CharField(max_length=100, blank=True)
+    calories = models.CharField(max_length=50, blank=True)
+    protein = models.CharField(max_length=50, blank=True)
+    carbs = models.CharField(max_length=50, blank=True)
+    fat = models.CharField(max_length=50, blank=True)
+    cost = models.CharField(max_length=50, blank=True)
+    ai_response = models.TextField(blank=True)
+    generated_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-generated_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.name} ({self.generated_at.strftime('%d %b %Y')})"
+
 # Auto-create UserProfile
 from django.db.models.signals import post_save
 from django.dispatch import receiver

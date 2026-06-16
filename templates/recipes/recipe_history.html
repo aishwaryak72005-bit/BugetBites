@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Recipe History – BudgetBites{% endblock %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  .history-page { font-family: 'Inter', sans-serif; min-height: 100vh; background: #0a0f1a; padding: 2rem 1rem 4rem; }
+
+  /* ── Header ── */
+  .history-header {
+    text-align: center; margin-bottom: 2.5rem;
+  }
+  .history-header h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900;
+    background: linear-gradient(135deg, #f97316, #fbbf24, #34d399);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: .5rem;
+  }
+  .history-header p { color: #94a3b8; font-size: 1rem; }
+
+  /* ── Stats Bar ── */
+  .stats-bar {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .stat-pill {
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 50px; padding: .5rem 1.25rem; display: flex; align-items: center;
+    gap: .5rem; font-size: .85rem; color: #cbd5e1;
+  }
+  .stat-pill span { font-weight: 700; color: #f97316; }
+
+  /* ── Premium Banner ── */
+  .premium-banner {
+    background: linear-gradient(135deg, rgba(249,115,22,.15), rgba(251,191,36,.10));
+    border: 1px solid rgba(249,115,22,.3); border-radius: 1rem;
+    padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 2rem; max-width: 700px; margin-left: auto; margin-right: auto;
+  }
+  .premium-banner .icon { font-size: 2rem; }
+  .premium-banner h3 { color: #fbbf24; font-weight: 800; margin: 0 0 .2rem; font-size: 1rem; }
+  .premium-banner p { color: #94a3b8; margin: 0; font-size: .85rem; }
+  .premium-banner a {
+    margin-left: auto; background: linear-gradient(135deg, #f97316, #fbbf24);
+    color: #000; font-weight: 800; border-radius: .75rem; padding: .6rem 1.25rem;
+    text-decoration: none; white-space: nowrap; font-size: .85rem; transition: transform .2s;
+  }
+  .premium-banner a:hover { transform: scale(1.05); }
+
+  /* ── Search & Filter ── */
+  .controls {
+    display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+    max-width: 900px; margin: 0 auto 2rem;
+  }
+  .search-wrap {
+    flex: 1; min-width: 220px; position: relative;
+  }
+  .search-wrap i {
+    position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+    color: #64748b; pointer-events: none;
+  }
+  .search-wrap input {
+    width: 100%; padding: .75rem 1rem .75rem 2.75rem;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+    border-radius: .875rem; color: #f1f5f9; font-size: .9rem; outline: none;
+    transition: border-color .2s;
+  }
+  .search-wrap input:focus { border-color: #f97316; }
+  .search-wrap input::placeholder { color: #475569; }
+  .search-wrap input:disabled { opacity: .4; cursor: not-allowed; }
+
+  .filter-tabs { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .filter-tab {
+    padding: .6rem 1.1rem; border-radius: 50px; font-size: .8rem; font-weight: 600;
+    border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04);
+    color: #94a3b8; cursor: pointer; text-decoration: none; transition: all .2s;
+  }
+  .filter-tab:hover, .filter-tab.active {
+    background: linear-gradient(135deg, #f97316, #fbbf24);
+    border-color: transparent; color: #000;
+  }
+  .filter-tab.locked { opacity: .4; cursor: not-allowed; pointer-events: none; }
+
+  /* ── Grid ── */
+  .history-grid {
+    display: grid; gap: 1.25rem; max-width: 900px; margin: 0 auto;
+  }
+
+  /* ── Card ── */
+  .history-card {
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+    border-radius: 1.25rem; overflow: hidden; transition: transform .25s, border-color .25s, box-shadow .25s;
+    display: flex; flex-direction: column;
+  }
+  .history-card:hover {
+    transform: translateY(-3px); border-color: rgba(249,115,22,.3);
+    box-shadow: 0 16px 40px rgba(249,115,22,.1);
+  }
+  .card-top {
+    display: flex; align-items: flex-start; gap: 1rem; padding: 1.25rem 1.25rem .75rem;
+  }
+  .card-emoji {
+    width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(249,115,22,.2), rgba(251,191,36,.15));
+    border: 1px solid rgba(249,115,22,.2); display: flex; align-items: center;
+    justify-content: center; font-size: 1.4rem;
+  }
+  .card-title { font-size: 1.05rem; font-weight: 800; color: #f1f5f9; margin: 0 0 .3rem; line-height: 1.3; }
+  .card-desc { font-size: .8rem; color: #64748b; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-meta { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; margin-top: .4rem; }
+  .card-time { font-size: .75rem; color: #475569; display: flex; align-items: center; gap: .3rem; }
+  .card-badge {
+    font-size: .65rem; font-weight: 700; padding: .2rem .6rem; border-radius: 50px;
+    background: rgba(249,115,22,.15); border: 1px solid rgba(249,115,22,.25); color: #f97316;
+  }
+
+  /* ── Nutrition Strip ── */
+  .nutrition-strip {
+    display: flex; gap: 0; border-top: 1px solid rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .nutri-item {
+    flex: 1; text-align: center; padding: .6rem .25rem;
+    border-right: 1px solid rgba(255,255,255,.06);
+  }
+  .nutri-item:last-child { border-right: none; }
+  .nutri-val { font-size: .9rem; font-weight: 800; }
+  .nutri-val.cal { color: #f97316; }
+  .nutri-val.pro { color: #34d399; }
+  .nutri-val.carb { color: #60a5fa; }
+  .nutri-val.fat { color: #f472b6; }
+  .nutri-label { font-size: .6rem; color: #475569; text-transform: uppercase; letter-spacing: .05em; margin-top: .1rem; }
+
+  /* ── Actions ── */
+  .card-actions {
+    display: flex; gap: .75rem; padding: .875rem 1.25rem; flex-wrap: wrap;
+  }
+  .btn-use-again {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: .5rem;
+    background: linear-gradient(135deg, #f97316, #fbbf24);
+    color: #000; font-weight: 800; font-size: .82rem; border-radius: .75rem;
+    padding: .65rem 1rem; border: none; cursor: pointer; text-decoration: none;
+    transition: opacity .2s, transform .2s; min-width: 130px;
+  }
+  .btn-use-again:hover { opacity: .9; transform: scale(1.02); }
+  .btn-use-again.locked {
+    background: rgba(255,255,255,.06); color: #475569;
+    border: 1px solid rgba(255,255,255,.1); cursor: not-allowed;
+  }
+  .btn-delete {
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
+    background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.2);
+    color: #ef4444; font-size: .82rem; font-weight: 600; border-radius: .75rem;
+    padding: .65rem .875rem; cursor: pointer; text-decoration: none;
+    transition: background .2s, transform .2s;
+  }
+  .btn-delete:hover { background: rgba(239,68,68,.2); transform: scale(1.02); }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center; padding: 4rem 2rem; max-width: 500px; margin: 0 auto;
+  }
+  .empty-icon { font-size: 4rem; margin-bottom: 1.25rem; opacity: .4; }
+  .empty-state h3 { font-size: 1.3rem; font-weight: 800; color: #f1f5f9; margin-bottom: .5rem; }
+  .empty-state p { color: #64748b; font-size: .9rem; margin-bottom: 1.5rem; }
+  .btn-generate {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: linear-gradient(135deg, #f97316, #fbbf24);
+    color: #000; font-weight: 800; border-radius: .875rem;
+    padding: .875rem 1.75rem; text-decoration: none; font-size: .9rem;
+    transition: transform .2s;
+  }
+  .btn-generate:hover { transform: scale(1.04); }
+
+  /* ── Limit badge ── */
+  .limit-note {
+    text-align: center; margin-bottom: 1.5rem;
+    font-size: .82rem; color: #64748b;
+  }
+  .limit-note strong { color: #f97316; }
+</style>
+
+<div class="history-page">
+
+  <!-- Header -->
+  <div class="history-header">
+    <h1>🕐 Recipe History</h1>
+    <p>Every recipe you've generated — automatically saved for you</p>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-pill">🍽️ Total Generated: <span>{{ total_count }}</span></div>
+    {% if premium %}
+    <div class="stat-pill">👑 Plan: <span>Premium — Unlimited</span></div>
+    {% else %}
+    <div class="stat-pill">📦 Plan: <span>Free — Last 10 kept</span></div>
+    {% endif %}
+  </div>
+
+  {% if not premium %}
+  <!-- Premium Upsell Banner -->
+  <div class="premium-banner" style="max-width:900px;">
+    <div class="icon">👑</div>
+    <div>
+      <h3>Unlock Unlimited History</h3>
+      <p>Free users keep only the last 10 recipes. Upgrade to Premium for unlimited history, search, and date filters!</p>
+    </div>
+    <a href="{% url 'upgrade_premium' %}">Upgrade →</a>
+  </div>
+  {% endif %}
+
+  <!-- Search & Filters -->
+  <div class="controls">
+    <form method="GET" action="{% url 'recipe_history' %}" style="display:contents;">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" name="q" value="{{ search_q }}"
+               placeholder="{% if premium %}Search your history...{% else %}Search (Premium only){% endif %}"
+               {% if not premium %}disabled{% endif %}
+               onchange="this.form.submit()">
+      </div>
+      <div class="filter-tabs">
+        <a href="?date=all{% if search_q %}&q={{ search_q }}{% endif %}"
+           class="filter-tab {% if date_filter == 'all' %}active{% endif %} {% if not premium %}locked{% endif %}">All</a>
+        <a href="?date=today{% if search_q %}&q={{ search_q }}{% endif %}"
+           class="filter-tab {% if date_filter == 'today' %}active{% endif %} {% if not premium %}locked{% endif %}">Today</a>
+        <a href="?date=week{% if search_q %}&q={{ search_q }}{% endif %}"
+           class="filter-tab {% if date_filter == 'week' %}active{% endif %} {% if not premium %}locked{% endif %}">This Week</a>
+        <a href="?date=month{% if search_q %}&q={{ search_q }}{% endif %}"
+           class="filter-tab {% if date_filter == 'month' %}active{% endif %} {% if not premium %}locked{% endif %}">This Month</a>
+      </div>
+    </form>
+  </div>
+
+  {% if not premium %}
+  <p class="limit-note">⚠️ Showing your <strong>last 10</strong> generated recipes. <a href="{% url 'upgrade_premium' %}" style="color:#f97316;">Go Premium</a> for unlimited!</p>
+  {% endif %}
+
+  <!-- History Grid -->
+  {% if history %}
+  <div class="history-grid">
+    {% for item in history %}
+    <div class="history-card">
+
+      <!-- Top -->
+      <div class="card-top">
+        <div class="card-emoji">
+          {% if 'chicken' in item.name|lower %}🍗
+          {% elif 'paneer' in item.name|lower %}🧀
+          {% elif 'rice' in item.name|lower or 'biryani' in item.name|lower %}🍚
+          {% elif 'egg' in item.name|lower %}🥚
+          {% elif 'dal' in item.name|lower or 'lentil' in item.name|lower %}🍲
+          {% elif 'pasta' in item.name|lower or 'noodle' in item.name|lower %}🍝
+          {% elif 'bread' in item.name|lower or 'roti' in item.name|lower %}🫓
+          {% elif 'fish' in item.name|lower or 'prawn' in item.name|lower %}🐟
+          {% elif 'soup' in item.name|lower %}🍜
+          {% elif 'salad' in item.name|lower %}🥗
+          {% else %}🍛
+          {% endif %}
+        </div>
+        <div style="flex:1; min-width:0;">
+          <p class="card-title">{{ item.name }}</p>
+          {% if item.description %}
+          <p class="card-desc">{{ item.description }}</p>
+          {% endif %}
+          <div class="card-meta">
+            <span class="card-time"><i class="far fa-clock"></i> {{ item.generated_at|date:"d M Y, h:i A" }}</span>
+            {% if item.cuisine %}<span class="card-badge">{{ item.cuisine }}</span>{% endif %}
+            {% if item.budget %}<span class="card-badge">₹{{ item.budget }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Nutrition Strip -->
+      {% if item.calories or item.protein or item.carbs or item.fat %}
+      <div class="nutrition-strip">
+        <div class="nutri-item">
+          <div class="nutri-val cal">{{ item.calories|default:"–" }}</div>
+          <div class="nutri-label">Calories</div>
+        </div>
+        <div class="nutri-item">
+          <div class="nutri-val pro">{{ item.protein|default:"–" }}</div>
+          <div class="nutri-label">Protein</div>
+        </div>
+        <div class="nutri-item">
+          <div class="nutri-val carb">{{ item.carbs|default:"–" }}</div>
+          <div class="nutri-label">Carbs</div>
+        </div>
+        <div class="nutri-item">
+          <div class="nutri-val fat">{{ item.fat|default:"–" }}</div>
+          <div class="nutri-label">Fat</div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Actions -->
+      <div class="card-actions">
+        {% if premium %}
+        <a href="{% url 'generate' %}?ingredients={{ item.ingredients_used|urlencode }}&budget={{ item.budget|urlencode }}&cuisine={{ item.cuisine|urlencode }}"
+           class="btn-use-again">
+          <i class="fas fa-redo"></i> Use Again
+        </a>
+        {% else %}
+        <button class="btn-use-again locked" title="Upgrade to Premium to use this feature"
+                onclick="alert('🔒 One-Click Regenerate is a Premium feature! Upgrade to reuse your past recipes instantly.')">
+          <i class="fas fa-lock"></i> Use Again (PRO)
+        </button>
+        {% endif %}
+
+        <a href="{% url 'delete_history' item.id %}"
+           class="btn-delete"
+           onclick="return confirm('Delete this recipe from history?')">
+          <i class="fas fa-trash-alt"></i> Delete
+        </a>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>No recipes yet!</h3>
+    <p>Start generating recipes and they'll automatically appear here — no saving required!</p>
+    <a href="{% url 'generate' %}" class="btn-generate">
+      <i class="fas fa-magic"></i> Generate Your First Recipe
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

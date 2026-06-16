@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from groq import Groq
-from .models import SavedRecipe, MealPlan, DailyRequestLog, UserProfile, MacroLog
+from .models import SavedRecipe, MealPlan, DailyRequestLog, UserProfile, MacroLog, RecipeHistory
 
 def is_user_premium(user):
     if user.is_superuser:
@@ -998,8 +998,39 @@ You must return the response strictly in the following format:
                 'youtube_videos': youtube_videos,
                 'selected_dish': selected_dish,
                 'quota_count': 0 if is_user_premium(request.user) else log.request_count,
-                'quota_limit': "∞" if is_user_premium(request.user) else 5,
+                'quota_limit': "\u221e" if is_user_premium(request.user) else 5,
             })
+
+            # --- AUTO-SAVE TO HISTORY ---
+            premium = is_user_premium(request.user)
+            for r in recipes:
+                if r.get('name'):
+                    nutrition = r.get('nutrition') or {}
+                    RecipeHistory.objects.create(
+                        user=request.user,
+                        name=r['name'],
+                        description=r.get('description', ''),
+                        ingredients_used=ingredients,
+                        budget=budget,
+                        cuisine=cuisine,
+                        calories=nutrition.get('calories', ''),
+                        protein=nutrition.get('protein', ''),
+                        carbs=nutrition.get('carbs', ''),
+                        fat=nutrition.get('fat', ''),
+                        cost=r.get('cost', ''),
+                        ai_response='',
+                    )
+            # Free users: keep only last 10 entries
+            if not premium:
+                all_ids = list(
+                    RecipeHistory.objects.filter(user=request.user)
+                    .order_by('-generated_at')
+                    .values_list('id', flat=True)
+                )
+                if len(all_ids) > 10:
+                    RecipeHistory.objects.filter(id__in=all_ids[10:]).delete()
+
+            return render(request, 'recipes/generate.html', {
 
         except Exception as e:
             error_message = f"AI Error: {str(e)}"
@@ -1590,3 +1621,52 @@ def api_generate_grocery_list(request):
         return JsonResponse({'grocery_list': grocery_list})
     except Exception as e:
         return JsonResponse({'error': 'Failed to parse AI grocery list.', 'raw': ai_response}, status=500)
+
+
+# ─── Recipe History ───────────────────────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def recipe_history_view(request):
+    """Shows the user's auto-saved recipe history with search & date filter."""
+    from django.utils import timezone
+    from datetime import timedelta
+
+    premium = is_user_premium(request.user)
+    search_q = request.GET.get('q', '').strip()
+    date_filter = request.GET.get('date', 'all')
+
+    history_qs = RecipeHistory.objects.filter(user=request.user)
+
+    # Search (premium only)
+    if premium and search_q:
+        history_qs = history_qs.filter(name__icontains=search_q)
+
+    # Date filter (premium only)
+    if premium and date_filter != 'all':
+        now = timezone.now()
+        if date_filter == 'today':
+            history_qs = history_qs.filter(generated_at__date=now.date())
+        elif date_filter == 'week':
+            history_qs = history_qs.filter(generated_at__gte=now - timedelta(days=7))
+        elif date_filter == 'month':
+            history_qs = history_qs.filter(generated_at__gte=now - timedelta(days=30))
+
+    history = list(history_qs)
+    total_count = RecipeHistory.objects.filter(user=request.user).count()
+
+    return render(request, 'recipes/recipe_history.html', {
+        'history': history,
+        'premium': premium,
+        'search_q': search_q,
+        'date_filter': date_filter,
+        'total_count': total_count,
+    })
+
+
+@login_required(login_url='/login/')
+def delete_history_view(request, history_id):
+    """Delete a single history entry."""
+    from django.shortcuts import get_object_or_404
+    entry = get_object_or_404(RecipeHistory, id=history_id, user=request.user)
+    entry.delete()
+    return redirect('recipe_history')

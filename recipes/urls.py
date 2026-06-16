@@ -31,4 +31,8 @@ urlpatterns = [
     
     # Premium: Grocery List
     path('api/meal-planner/grocery-list/', views.api_generate_grocery_list, name='api_generate_grocery_list'),
+
+    # Recipe History
+    path('history/', views.recipe_history_view, name='recipe_history'),
+    path('history/delete/<int:history_id>/', views.delete_history_view, name='delete_history'),
 ]
