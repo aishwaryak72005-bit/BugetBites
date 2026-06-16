@@ -1031,6 +1031,19 @@ You must return the response strictly in the following format:
                     RecipeHistory.objects.filter(id__in=all_ids[10:]).delete()
 
             return render(request, 'recipes/generate.html', {
+                'quick_ingredients': quick_ingredients,
+                'quick_budgets': quick_budgets,
+                'recipes': recipes,
+                'ai_response': ai_response,
+                'ingredients': ingredients,
+                'budget': budget,
+                'serving_size': serving_size,
+                'cuisine': cuisine,
+                'youtube_videos': youtube_videos,
+                'selected_dish': selected_dish,
+                'quota_count': 0 if is_user_premium(request.user) else log.request_count,
+                'quota_limit': "\u221e" if is_user_premium(request.user) else 5,
+            })
 
         except Exception as e:
             error_message = f"AI Error: {str(e)}"
