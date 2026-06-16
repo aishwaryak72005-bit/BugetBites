@@ -792,7 +792,7 @@ def generate_view(request):
         leftover_mode = request.POST.get('leftover_mode', False)
         selected_dish = request.POST.get('selected_dish', '')
         
-        if log.request_count >= 5:
+        if log.request_count >= 5 and not request.user.is_superuser:
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
                 'quick_budgets': quick_budgets,
@@ -983,22 +983,28 @@ You must return the response strictly in the following format:
 
         except Exception as e:
             error_message = f"AI Error: {str(e)}"
+            quota_count = 0 if request.user.is_superuser else log.request_count
+            quota_limit = "∞" if request.user.is_superuser else 5
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
                 'quick_budgets': quick_budgets,
                 'error_message': error_message,
-                'quota_count': log.request_count,
-                'quota_limit': 5,
+                'quota_count': quota_count,
+                'quota_limit': quota_limit,
             })
 
     from datetime import date
     from django.utils import timezone
     log, _ = DailyRequestLog.objects.get_or_create(user=request.user, date=timezone.localdate())
+    
+    quota_count = 0 if request.user.is_superuser else log.request_count
+    quota_limit = "∞" if request.user.is_superuser else 5
+    
     return render(request, 'recipes/generate.html', {
         'quick_ingredients': quick_ingredients,
         'quick_budgets': quick_budgets,
-        'quota_count': log.request_count,
-        'quota_limit': 5,
+        'quota_count': quota_count,
+        'quota_limit': quota_limit,
     })
 
 
