@@ -548,24 +548,22 @@
                   style="background: #25D366; color: white; border: none; padding: 10px 24px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(37,211,102,0.3); transition: all 0.2s;"
                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(37,211,102,0.4)';"
                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(37,211,102,0.3)';"
+                <button onclick="shareRecipe('{{ recipe.share_id }}', '{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)"
+                  class="btn rounded-pill border-0 px-4 fw-bold shadow-sm d-flex align-items-center gap-2"
+                  style="background: #25D366; color: white; transition: all 0.2s;"
+                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(37,211,102,0.4)';"
+                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(37,211,102,0.3)';"
                 >
-                  <i class="fab fa-whatsapp"></i> Share
+                  <i class="fas fa-copy"></i> Copy Recipe
                 </button>
-                <a href="https://www.youtube.com/results?search_query={{ recipe.name|urlencode }}+recipe" target="_blank"
-                  style="background: #ef4444; color: white; text-decoration: none; padding: 10px 24px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(239,68,68,0.3); transition: all 0.2s;"
-                  onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(239,68,68,0.4)';"
-                  onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(239,68,68,0.3)';"
-                >
-                  <i class="fab fa-youtube"></i> Video
-                </a>
-                <a href="https://www.pinterest.com/search/pins/?q={{ recipe.name|urlencode }}+recipe" target="_blank"
-                  style="background: linear-gradient(135deg, #E60023, #ad081b); color: white; text-decoration: none; padding: 10px 24px; border-radius: 24px; font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(230,0,35,0.3); transition: all 0.2s;"
+                <button onclick="shareRecipe('{{ recipe.share_id }}', '{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)"
+                  class="btn rounded-pill border-0 px-4 fw-bold shadow-sm d-flex align-items-center gap-2"
+                  style="background: linear-gradient(135deg, #E60023, #ad081b); color: white; transition: all 0.2s;"
                   onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(230,0,35,0.4)';"
                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(230,0,35,0.3)';"
-                  title="Find {{ recipe.name }} ideas on Pinterest"
                 >
-                  <i class="fab fa-pinterest"></i> Pinterest
-                </a>
+                  <i class="fas fa-copy"></i> Copy for Pinterest
+                </button>
               </div>
             </div>
           </div>
@@ -1522,17 +1520,19 @@
             const shareUrl = window.location.origin + '/share/' + data.share_id + '/';
             const shareText = 'Check out this delicious recipe I generated on BudgetBites! 🍲🍳\n\n*' + name + '*\n' + description + '\n\n' + shareUrl;
 
-            // Try Web Share API first (works on mobile browsers & PWAs)
-            if (navigator.share && window.isSecureContext) {
-                navigator.share({
-                    title: name + ' — BudgetBites',
-                    text: shareText,
-                    url: shareUrl,
-                }).catch(() => {});
-            } else {
-                // Fallback: Try Android's strict intent scheme which works better in WebViews
-                window.location.href = 'intent://send?text=' + encodeURIComponent(shareText) + '#Intent;scheme=whatsapp;package=com.whatsapp;end';
-            }
+            // Copy to Clipboard Fallback for App Wrappers
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('Recipe Copied! Paste it in WhatsApp or Pinterest.');
+            }).catch(err => {
+                // Legacy fallback for older WebViews
+                const tempInput = document.createElement("textarea");
+                tempInput.value = shareText;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+                alert('Recipe Copied! Paste it in WhatsApp or Pinterest.');
+            });
 
             btn.innerHTML = '✅ Shared!';
             setTimeout(() => {
