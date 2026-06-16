@@ -3,7 +3,17 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from groq import Groq
-from .models import SavedRecipe, MealPlan, DailyRequestLog
+from .models import SavedRecipe, MealPlan, DailyRequestLog, UserProfile, MacroLog
+
+def is_user_premium(user):
+    if user.is_superuser:
+        return True
+    try:
+        if hasattr(user, 'profile') and user.profile.is_premium:
+            return True
+    except Exception:
+        pass
+    return False
 import os
 import requests
 import urllib.parse as _urlparse
@@ -801,7 +811,7 @@ def generate_view(request):
         leftover_mode = request.POST.get('leftover_mode', False)
         selected_dish = request.POST.get('selected_dish', '')
         
-        if log.request_count >= 5 and not request.user.is_superuser:
+        if log.request_count >= 5 and not is_user_premium(request.user):
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
                 'quick_budgets': quick_budgets,
@@ -987,14 +997,14 @@ You must return the response strictly in the following format:
                 'cuisine': cuisine,
                 'youtube_videos': youtube_videos,
                 'selected_dish': selected_dish,
-                'quota_count': 0 if request.user.is_superuser else log.request_count,
-                'quota_limit': "∞" if request.user.is_superuser else 5,
+                'quota_count': 0 if is_user_premium(request.user) else log.request_count,
+                'quota_limit': "∞" if is_user_premium(request.user) else 5,
             })
 
         except Exception as e:
             error_message = f"AI Error: {str(e)}"
-            quota_count = 0 if request.user.is_superuser else log.request_count
-            quota_limit = "∞" if request.user.is_superuser else 5
+            quota_count = 0 if is_user_premium(request.user) else log.request_count
+            quota_limit = "∞" if is_user_premium(request.user) else 5
             return render(request, 'recipes/generate.html', {
                 'quick_ingredients': quick_ingredients,
                 'quick_budgets': quick_budgets,
@@ -1016,8 +1026,8 @@ You must return the response strictly in the following format:
         log.request_count = 0
         log.save()
     
-    quota_count = 0 if request.user.is_superuser else log.request_count
-    quota_limit = "∞" if request.user.is_superuser else 5
+    quota_count = 0 if is_user_premium(request.user) else log.request_count
+    quota_limit = "∞" if is_user_premium(request.user) else 5
     
     return render(request, 'recipes/generate.html', {
         'quick_ingredients': quick_ingredients,
@@ -1492,3 +1502,91 @@ def api_cravings_instructions(request):
         return JsonResponse({'instructions': ai_response})
         
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+# ─── Fitness Macro Tracker ───────────────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def macros_view(request):
+    """Premium Dashboard to view daily macros."""
+    if not is_user_premium(request.user):
+        return redirect('upgrade_premium')
+        
+    from django.utils import timezone
+    today = timezone.localdate()
+    
+    logs = MacroLog.objects.filter(user=request.user, date=today)
+    
+    total_cals = sum(log.calories for log in logs)
+    total_protein = sum(log.protein_g for log in logs)
+    total_carbs = sum(log.carbs_g for log in logs)
+    total_fats = sum(log.fats_g for log in logs)
+    
+    return render(request, 'recipes/macros.html', {
+        'logs': logs,
+        'total_cals': total_cals,
+        'total_protein': total_protein,
+        'total_carbs': total_carbs,
+        'total_fats': total_fats,
+    })
+
+@login_required(login_url='/login/')
+@require_POST
+def log_macro_api(request):
+    if not is_user_premium(request.user):
+        return JsonResponse({'error': 'Premium required'}, status=403)
+        
+    import json
+    try:
+        data = json.loads(request.body)
+        MacroLog.objects.create(
+            user=request.user,
+            recipe_name=data.get('recipe_name', 'Unknown Recipe'),
+            calories=int(data.get('calories', 0)),
+            protein_g=int(data.get('protein', 0)),
+            carbs_g=int(data.get('carbs', 0)),
+            fats_g=int(data.get('fats', 0))
+        )
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+# ─── AI Grocery List Generator ───────────────────────────────────────────────
+
+@login_required(login_url='/login/')
+def api_generate_grocery_list(request):
+    """Gathers all recipes in the Meal Plan and generates a categorized grocery list."""
+    if not is_user_premium(request.user):
+        return JsonResponse({'error': 'Premium required'}, status=403)
+        
+    plans = MealPlan.objects.filter(user=request.user)
+    if not plans.exists():
+        return JsonResponse({'error': 'Your meal plan is empty!'})
+        
+    recipe_names = [p.recipe_name for p in plans]
+    recipes_text = ", ".join(recipe_names)
+    
+    prompt = f"""
+    The user is planning to cook the following meals this week:
+    {recipes_text}
+    
+    Act as a smart grocery assistant. Combine all the ingredients needed for these meals into a single, organized grocery list.
+    Group them by supermarket aisle (e.g., Produce, Dairy, Spices, Meat, Pantry).
+    Return the response as a valid JSON object where keys are aisle names and values are arrays of strings (ingredient and rough amount).
+    Example:
+    {{
+      "Produce": ["4 Onions", "2 Tomatoes"],
+      "Dairy": ["500ml Milk", "200g Paneer"]
+    }}
+    Do NOT include markdown backticks. Just raw JSON.
+    """
+    
+    ai_response = call_gemini_api(prompt, "You are a smart grocery list generator. Output strictly valid JSON.", temperature=0.2)
+    try:
+        import json
+        clean_json = ai_response.replace('```json', '').replace('```', '').strip()
+        grocery_list = json.loads(clean_json)
+        return JsonResponse({'grocery_list': grocery_list})
+    except Exception as e:
+        return JsonResponse({'error': 'Failed to parse AI grocery list.', 'raw': ai_response}, status=500)

@@ -56,4 +56,42 @@ class DailyRequestLog(models.Model):
         unique_together = ('user', 'date')
 
     def __str__(self):
-        return f"{self.user.username} - {self.date}: {self.request_count} requests"
+        return f"{self.user.username} - {self.date}: {self.request_count} requests"
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    is_premium = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"{self.user.username} Profile (Premium: {self.is_premium})"
+
+class MacroLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    recipe_name = models.CharField(max_length=200)
+    calories = models.IntegerField(default=0)
+    protein_g = models.IntegerField(default=0)
+    carbs_g = models.IntegerField(default=0)
+    fats_g = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.recipe_name} ({self.calories} kcal)"
+
+# Auto-create UserProfile
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    if not hasattr(instance, 'profile'):
+        UserProfile.objects.create(user=instance)
+    instance.profile.save()

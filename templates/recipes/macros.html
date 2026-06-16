@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}BudgetBites Pro - Macro Tracker{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bolder">Daily Macro Tracker <span class="badge rounded-pill bg-warning text-dark fs-6 ms-2">PRO</span></h1>
+    <span class="text-muted fw-bold">{{ now|date:"l, F j" }}</span>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-3 col-6">
+      <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">
+        <div class="card-body text-center p-4">
+          <i class="fas fa-fire fs-2 mb-2" style="color: #D97706;"></i>
+          <h5 class="fw-bold mb-1">Calories</h5>
+          <h2 class="fw-bolder mb-0 text-dark">{{ total_cals }}</h2>
+          <small class="text-muted">kcal</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #DBEAFE, #BFDBFE);">
+        <div class="card-body text-center p-4">
+          <i class="fas fa-drumstick-bite fs-2 mb-2" style="color: #2563EB;"></i>
+          <h5 class="fw-bold mb-1">Protein</h5>
+          <h2 class="fw-bolder mb-0 text-dark">{{ total_protein }}</h2>
+          <small class="text-muted">grams</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #D1FAE5, #A7F3D0);">
+        <div class="card-body text-center p-4">
+          <i class="fas fa-bread-slice fs-2 mb-2" style="color: #059669;"></i>
+          <h5 class="fw-bold mb-1">Carbs</h5>
+          <h2 class="fw-bolder mb-0 text-dark">{{ total_carbs }}</h2>
+          <small class="text-muted">grams</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-6">
+      <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #FCE7F3, #FBCFE8);">
+        <div class="card-body text-center p-4">
+          <i class="fas fa-cheese fs-2 mb-2" style="color: #DB2777;"></i>
+          <h5 class="fw-bold mb-1">Fats</h5>
+          <h2 class="fw-bolder mb-0 text-dark">{{ total_fats }}</h2>
+          <small class="text-muted">grams</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="fw-bold mb-3">Today's Meals</h3>
+  {% if logs %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Time</th>
+          <th>Recipe Name</th>
+          <th>Calories</th>
+          <th>Protein (g)</th>
+          <th>Carbs (g)</th>
+          <th>Fats (g)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td class="text-muted">{{ log.created_at|date:"h:i A" }}</td>
+          <td class="fw-bold">{{ log.recipe_name }}</td>
+          <td>{{ log.calories }}</td>
+          <td>{{ log.protein_g }}</td>
+          <td>{{ log.carbs_g }}</td>
+          <td>{{ log.fats_g }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center p-5 bg-light rounded-4 border border-dashed">
+    <i class="fas fa-utensils fs-1 text-muted mb-3"></i>
+    <h4 class="fw-bold text-muted">No meals logged today</h4>
+    <p class="text-muted">Generate a recipe and click "Log Macros" to track your nutrition!</p>
+    <a href="{% url 'generate' %}" class="btn btn-success fw-bold mt-2">Generate Recipe</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

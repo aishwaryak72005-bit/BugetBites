@@ -24,4 +24,11 @@ urlpatterns = [
     path('api/cravings/checklist/', views.api_cravings_checklist, name='api_cravings_checklist'),
     path('api/cravings/instructions/', views.api_cravings_instructions, name='api_cravings_instructions'),
     path('upgrade/', views.upgrade_premium_view, name='upgrade_premium'),
+    
+    # Premium: Macros
+    path('macros/', views.macros_view, name='macros'),
+    path('api/macros/log/', views.log_macro_api, name='log_macro_api'),
+    
+    # Premium: Grocery List
+    path('api/meal-planner/grocery-list/', views.api_generate_grocery_list, name='api_generate_grocery_list'),
 ]
