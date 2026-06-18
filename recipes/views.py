@@ -45,7 +45,7 @@ def call_gemini_api(prompt, system_instruction="", max_tokens=1200, temperature=
     req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
     
     try:
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=10) as response:
             result = json.loads(response.read().decode())
             return result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '')
     except Exception as e:
@@ -59,6 +59,7 @@ def call_gemini_api(prompt, system_instruction="", max_tokens=1200, temperature=
             ],
             max_tokens=max_tokens,
             temperature=temperature,
+            timeout=15
         )
         return response.choices[0].message.content
 
