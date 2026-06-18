@@ -19,6 +19,7 @@ import requests
 import urllib.parse as _urlparse
 import urllib.request
 import json
+import re
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -405,7 +406,6 @@ def parse_recipes(ai_response):
                         recipe['missing'].append(display)
                 elif 'Nutritional Info' in line:
                     try:
-                        import re
                         # Split by the first colon to get the data part
                         data_part = line.split(':', 1)[1]
                         nutri_parts = data_part.split('|')
