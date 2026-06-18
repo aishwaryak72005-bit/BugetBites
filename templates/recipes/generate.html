@@ -2221,10 +2221,10 @@
     </div>
 
     <!-- MAIN ROW CONTAINER -->
-    <div style="flex: 1; display: flex; flex-direction: row; min-height: 0; position: relative;">
+    <div class="cooking-main-container" style="flex: 1; display: flex; flex-direction: row; min-height: 0; position: relative;">
 
         <!-- LEFT SIDEBAR: TIMELINE -->
-        <div style="width: 350px; background: rgba(0,0,0,0.25); backdrop-filter: blur(25px); border-right: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; padding: 30px; box-shadow: 5px 0 25px rgba(0,0,0,0.3); z-index: 10;">
+        <div class="cooking-sidebar" style="width: 350px; background: rgba(0,0,0,0.25); backdrop-filter: blur(25px); border-right: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; padding: 30px; box-shadow: 5px 0 25px rgba(0,0,0,0.3); z-index: 10;">
             <div class="mb-4">
                 <h5 id="cooking-recipe-name" style="color: white; font-weight: 900; margin: 0 0 6px 0; line-height: 1.3; font-size: 1.4rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Recipe Name</h5>
                 <span style="font-size: 0.8rem; color: #A7F3D0; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800;"><i class="fas fa-list-ol me-1"></i> Cooking Timeline</span>
@@ -2236,7 +2236,7 @@
         </div>
 
         <!-- MAIN STAGE: TELEPROMPTER & TIMER -->
-        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; position: relative; overflow: hidden;">
+        <div class="cooking-stage" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; position: relative; overflow: hidden; overflow-y: auto;">
             
             <div style="max-width: 900px; width: 100%; text-align: center; position: relative; z-index: 2;">
                 <div id="cooking-step-number" style="background: rgba(5, 150, 105, 0.2); color: #34D399; display: inline-block; padding: 8px 24px; border-radius: 30px; font-weight: 800; font-size: 0.9rem; margin-bottom: 30px; letter-spacing: 2px; border: 1px solid rgba(5, 150, 105, 0.3);">STEP 1</div>
@@ -2368,6 +2368,37 @@
     position: absolute; left: 6px; top: 18px; bottom: -8px; width: 2px; background: #374151; z-index: 1; transition: background 0.3s;
 }
 .timeline-line.active { background: #059669; }
+
+/* Responsive Overrides for Cooking Overlay */
+@media (max-width: 768px) {
+    .cooking-main-container {
+        flex-direction: column !important;
+        overflow-y: auto;
+    }
+    .cooking-sidebar {
+        width: 100% !important;
+        height: 250px !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.15) !important;
+        padding: 15px !important;
+        flex-shrink: 0;
+    }
+    .cooking-stage {
+        padding: 20px !important;
+        min-height: 400px;
+    }
+    #cooking-step-text {
+        font-size: clamp(1.5rem, 6vw, 2.5rem) !important;
+        margin-bottom: 30px !important;
+    }
+    #cooking-needed-now {
+        position: relative !important;
+        top: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        margin-bottom: 20px;
+    }
+}
 </style>
 
 <!-- Fridge Scanner Overlay -->
