@@ -53,7 +53,7 @@ def call_gemini_api(prompt, system_instruction="", max_tokens=1200, temperature=
         print(f"Gemini API Error: {e}")
         # Fallback to Groq
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_instruction or "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
@@ -663,7 +663,7 @@ Reply ONLY with this exact format — nothing else:
 
         try:
             response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="llama-3.1-8b-instant",
                 messages=[
                     {
                         "role": "system",
@@ -1071,7 +1071,7 @@ You must return the response strictly in the following format:
         try:
             system_instruction = "You are a helpful Indian recipe assistant. Always follow the exact format provided."
             response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model="llama-3.1-8b-instant",
                 messages=[
                     {
                         "role": "system",
@@ -1387,7 +1387,7 @@ def cooking_tips_view(request):
             "Each tip should be one clear sentence."
         )
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": "You are an expert chef. Output strictly valid JSON without markdown."},
                 {"role": "user", "content": prompt},
@@ -1431,7 +1431,7 @@ def chatbot_api(request):
         )
 
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
@@ -1475,7 +1475,7 @@ Missing Ingredients to Buy:
 None
 """
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[
                 {"role": "system", "content": "You are an expert chef. Follow the exact format."},
                 {"role": "user", "content": prompt}
