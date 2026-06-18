@@ -376,8 +376,15 @@ def parse_recipes(ai_response):
                         ing_parts = [p.strip() for p in ingredient.split('|')]
                         ing_name = ing_parts[0].replace('✅', '').replace('❌', '').strip()
                         measurement = ing_parts[1] if len(ing_parts) > 1 else ""
+                        
+                        clean_name = ing_name
+                        if measurement and clean_name.lower().startswith(measurement.lower()):
+                            clean_name = clean_name[len(measurement):].strip()
+                            if clean_name.startswith('-'):
+                                clean_name = clean_name[1:].strip()
+                                
                         recipe['ingredients'].append({
-                            'text': ing_name,
+                            'text': clean_name.capitalize() if clean_name else ing_name,
                             'measurement': measurement,
                             'have': has_it,
                         })
@@ -744,14 +751,13 @@ def calculate_recipe_nutrition(ingredients_list, servings):
     ingredient_details = []
     
     def fetch_ing(ing):
-        name = ing.get('text', '')
-        measure = ing.get('measurement', '')
-        full_str = f"{measure} {name}".strip()
+        name = ing.get('text', '').strip()
+        measure = ing.get('measurement', '').strip()
         
         nutri = calculate_nutrition(name, measure)
         return {
-            'name': name,
-            'quantity': full_str,
+            'name': name.capitalize() if name else 'Ingredient',
+            'quantity': measure if measure else 'As required',
             'grams': nutri.get('grams', 100),
             'nutrition': nutri
         }
