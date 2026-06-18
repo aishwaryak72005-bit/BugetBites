@@ -987,21 +987,6 @@ You must return the response strictly in the following format:
                 # Image fetching is fully disabled, so we intentionally leave image_url empty
                 pass
 
-            return render(request, 'recipes/generate.html', {
-                'quick_ingredients': quick_ingredients,
-                'quick_budgets': quick_budgets,
-                'recipes': recipes,
-                'ai_response': ai_response,
-                'ingredients': ingredients,
-                'budget': budget,
-                'serving_size': serving_size,
-                'cuisine': cuisine,
-                'youtube_videos': youtube_videos,
-                'selected_dish': selected_dish,
-                'quota_count': 0 if is_user_premium(request.user) else log.request_count,
-                'quota_limit': "\u221e" if is_user_premium(request.user) else 5,
-            })
-
             # --- AUTO-SAVE TO HISTORY ---
             premium = is_user_premium(request.user)
             for r in recipes:

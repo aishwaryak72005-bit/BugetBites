@@ -1,4 +1,4 @@
-<div class="rounded-3xl bg-[#064E3B] text-emerald-50 shadow-2xl ring-1 ring-emerald-800 mb-10 overflow-hidden group" style="font-family: 'Poppins', sans-serif;" data-share-id="{% if saved_recipe_obj %}{{ saved_recipe_obj.share_id }}{% endif %}">
+<div id="recipe-card-content-{{ forloop.counter }}" class="rounded-3xl bg-[#064E3B] text-emerald-50 shadow-2xl ring-1 ring-emerald-800 mb-10 overflow-hidden group" style="font-family: 'Poppins', sans-serif;" data-share-id="{% if saved_recipe_obj %}{{ saved_recipe_obj.share_id }}{% endif %}">
   
   <!-- Header Section (Green Background) -->
   <div class="p-6 sm:p-8">
@@ -108,7 +108,7 @@
       <i class="far fa-bookmark text-emerald-400"></i> Save
     </button>
     {% endif %}
-    <button onclick="shareRecipe('{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', '{% if saved_recipe_obj %}{{ saved_recipe_obj.share_id }}{% endif %}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
+    <button onclick="shareRecipeLink('{{ recipe.name|escapejs }}', '{{ recipe.description|escapejs }}', this)" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">
       <i class="fas fa-share-nodes text-orange-400"></i> Share
     </button>
     <button onclick="downloadPDF('{{ forloop.counter }}', '{{ recipe.name|escapejs }}')" class="inline-flex items-center gap-2 rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-emerald-100 border border-emerald-700 hover:bg-emerald-700 transition-colors shadow-sm">

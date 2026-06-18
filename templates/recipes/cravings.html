@@ -10,7 +10,33 @@
     min-height: calc(100vh - 70px);
     color: white;
     font-family: 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
+  
+  /* Markdown Styling for Cravings Output */
+  #finalInstructions {
+    font-size: 1.05rem;
+  }
+  #finalInstructions h3, #finalInstructions h4 {
+    color: #FBBF24;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+  }
+  #finalInstructions p {
+    margin-bottom: 1rem;
+  }
+  #finalInstructions ul, #finalInstructions ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+  #finalInstructions li {
+    margin-bottom: 0.5rem;
+  }
+  #finalInstructions strong {
+    color: white;
+  }
+
   .glass-card {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(16px);
@@ -258,9 +284,10 @@ document.getElementById('cookBtn').addEventListener('click', function() {
     document.getElementById('step3-card').style.display = 'block';
     document.getElementById('finalTitle').innerText = document.getElementById('cravingInput').value;
     
-    let html = data.instructions.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b class="text-white">$1</b>');
+    let html = marked.parse(data.instructions);
     document.getElementById('finalInstructions').innerHTML = html;
   });
 });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 {% endblock %}

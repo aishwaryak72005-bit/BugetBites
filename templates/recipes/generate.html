@@ -1512,19 +1512,25 @@
             const shareUrl = window.location.origin + '/share/' + data.share_id + '/';
             const shareText = 'Check out this delicious recipe I generated on BudgetBites! 🍲🍳\n\n*' + name + '*\n' + description + '\n\n' + shareUrl;
 
-            // Copy to Clipboard Fallback for App Wrappers
-            navigator.clipboard.writeText(shareText).then(() => {
-                alert('Recipe Copied! Paste it in WhatsApp or Pinterest.');
-            }).catch(err => {
-                // Legacy fallback for older WebViews
-                const tempInput = document.createElement("textarea");
-                tempInput.value = shareText;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand("copy");
-                document.body.removeChild(tempInput);
-                alert('Recipe Copied! Paste it in WhatsApp or Pinterest.');
-            });
+            if (navigator.share) {
+                navigator.share({
+                    title: 'BudgetBites Recipe: ' + name,
+                    text: 'Check out this delicious recipe I generated on BudgetBites! 🍲🍳\n\n*' + name + '*\n' + description,
+                    url: shareUrl
+                }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    alert('Share link copied to clipboard!');
+                }).catch(err => {
+                    const tempInput = document.createElement("textarea");
+                    tempInput.value = shareUrl;
+                    document.body.appendChild(tempInput);
+                    tempInput.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(tempInput);
+                    alert('Share link copied to clipboard!');
+                });
+            }
 
             btn.innerHTML = '✅ Shared!';
             setTimeout(() => {
@@ -2515,7 +2521,7 @@ function logMacros(recipeName, calories, protein, carbs, fats, btnElement) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
+            'X-CSRFToken': '{{ csrf_token }}'
         },
         body: JSON.stringify({
             recipe_name: recipeName,
