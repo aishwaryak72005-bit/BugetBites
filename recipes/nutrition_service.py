@@ -68,7 +68,8 @@ def get_nutrition_for_ingredient(ingredient_name, quantity_grams):
         params = {
             'query': ingredient_name,
             'api_key': api_key,
-            'pageSize': 1
+            'pageSize': 1,
+            'dataType': ['Foundation', 'SR Legacy']
         }
         response = requests.get(url, params=params, timeout=5)
         response.raise_for_status()
@@ -135,34 +136,55 @@ def _fallback_groq_nutrition(ingredient_name, quantity_grams, default_result):
     return default_result
 
 import re
-def parse_quantity_to_grams(amount_str):
+def parse_quantity_to_grams(amount_str, ingredient_name=""):
     """
     Parses a string like '2 eggs' or '400g chicken' into integer grams.
     Uses CONVERSIONS dict first, then regex.
     """
     amount_str = str(amount_str).lower().strip()
+    ingredient_name = str(ingredient_name).lower().strip()
+    full_str = f"{amount_str} {ingredient_name}".strip()
     
-    # 1. Exact match in conversions
+    # Normalize common words
+    full_str = full_str.replace("tablespoon", "tbsp").replace("tablespoons", "tbsp")
+    full_str = full_str.replace("teaspoon", "tsp").replace("teaspoons", "tsp")
+    full_str = full_str.replace("medium ", "").replace("large ", "").replace("small ", "").replace("chopped ", "")
+
+    # 1. Exact match in conversions for full_str or amount_str
     for key, grams in CONVERSIONS.items():
-        if key in amount_str:
+        if key in full_str or key in amount_str:
             return grams
             
     # 2. Extract explicit grams or kg
-    g_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:g|gram|grams)', amount_str)
+    g_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:g|gram|grams)', full_str)
     if g_match:
         return int(float(g_match.group(1)))
         
-    kg_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:kg|kilo|kilogram)', amount_str)
+    kg_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:kg|kilo|kilogram)', full_str)
     if kg_match:
         return int(float(kg_match.group(1)) * 1000)
         
-    ml_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:ml|milliliter)', amount_str)
+    ml_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:ml|milliliter)', full_str)
     if ml_match:
         return int(float(ml_match.group(1))) # 1ml ~ 1g for liquids
         
-    l_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:l|liter|litre)', amount_str)
+    l_match = re.search(r'(\d+(?:\.\d+)?)\s*(?:l|liter|litre)', full_str)
     if l_match:
         return int(float(l_match.group(1)) * 1000)
+        
+    # Default fallback based on type
+    if 'tbsp' in full_str:
+        num = re.search(r'(\d+(?:\.\d+)?)', full_str)
+        if num: return int(float(num.group(1)) * 15)
+        return 15
+    if 'tsp' in full_str:
+        num = re.search(r'(\d+(?:\.\d+)?)', full_str)
+        if num: return int(float(num.group(1)) * 5)
+        return 5
+    if 'cup' in full_str:
+        num = re.search(r'(\d+(?:\.\d+)?)', full_str)
+        if num: return int(float(num.group(1)) * 200)
+        return 200
         
     # Default fallback: assume 100g if we absolutely can't tell
     return 100

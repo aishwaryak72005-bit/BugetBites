@@ -603,16 +603,30 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
       }
 
-      /* ── RECIPE CARD WHITE PANEL - ALWAYS dark text, never inherit dark mode ── */
-      .recipe-white-panel,
-      .recipe-white-panel * {
+      /* ── RECIPE CARD WHITE PANEL ── */
+      /* Light mode defaults */
+      html:not(.dark-mode) .recipe-white-panel,
+      html:not(.dark-mode) .recipe-white-panel * {
         color: #1e293b !important;
       }
-      .recipe-white-panel .text-white,
-      .recipe-white-panel [class*="text-white"] {
+      html:not(.dark-mode) .recipe-white-panel .text-white,
+      html:not(.dark-mode) .recipe-white-panel [class*="text-white"] {
         color: #1e293b !important;
       }
-      /* Exception: step number circles should stay white text */
+      /* Dark mode explicit overrides for the recipe panel */
+      .dark-mode .recipe-white-panel {
+        background: #1f2937 !important;
+        border-color: #374151 !important;
+      }
+      .dark-mode .recipe-white-panel * {
+        color: #f8fafc !important;
+      }
+      .dark-mode .recipe-white-panel div[style*="background:#ffffff"],
+      .dark-mode .recipe-white-panel div[style*="background:#f8fafc"] {
+        background: #374151 !important;
+        border-color: #4b5563 !important;
+      }
+      /* Step numbers inside circles should always be white text */
       .recipe-white-panel div[style*="background:#064E3B"],
       .recipe-white-panel div[style*="background: #064E3B"] {
         color: #ffffff !important;

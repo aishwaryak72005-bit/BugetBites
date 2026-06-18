@@ -749,7 +749,7 @@ def calculate_recipe_nutrition(ingredients_list, servings):
         name = ing.get('text', '')
         measure = ing.get('measurement', '')
         full_str = f"{measure} {name}".strip()
-        grams = parse_quantity_to_grams(full_str)
+        grams = parse_quantity_to_grams(measure, name)
         
         nutri = get_nutrition_for_ingredient(name, grams)
         return {

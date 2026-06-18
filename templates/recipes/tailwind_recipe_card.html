@@ -133,12 +133,12 @@
   <!-- BOOTSTRAP 5 TABS -->
   <ul class="nav nav-pills px-6 pt-2 flex gap-2 border-0" id="recipeTabs-{{ forloop.counter }}" role="tablist">
     <li class="nav-item flex-1" role="presentation">
-      <button class="nav-link active w-full py-4 text-sm font-black text-emerald-900 bg-white rounded-t-2xl flex items-center justify-center gap-2 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-10" id="recipe-tab-{{ forloop.counter }}" data-bs-toggle="tab" data-bs-target="#recipe-content-{{ forloop.counter }}" type="button" role="tab" style="border-radius: 1rem 1rem 0 0;">
+      <button class="nav-link active w-full py-4 text-sm font-black bg-white rounded-t-2xl flex items-center justify-center gap-2 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-10 recipe-tab-btn" id="recipe-tab-{{ forloop.counter }}" data-bs-toggle="tab" data-bs-target="#recipe-content-{{ forloop.counter }}" type="button" role="tab" style="border-radius: 1rem 1rem 0 0;">
         <i class="fas fa-utensils text-orange-500"></i> Recipe
       </button>
     </li>
     <li class="nav-item flex-1" role="presentation">
-      <button class="nav-link w-full py-4 text-sm font-bold text-emerald-200 bg-emerald-800/50 hover:bg-emerald-800 rounded-t-2xl flex items-center justify-center gap-2 transition-colors border-b border-white z-0" id="nutrition-tab-{{ forloop.counter }}" data-bs-toggle="tab" data-bs-target="#nutrition-content-{{ forloop.counter }}" type="button" role="tab" style="border-radius: 1rem 1rem 0 0;">
+      <button class="nav-link w-full py-4 text-sm font-bold bg-emerald-800/50 hover:bg-emerald-800 rounded-t-2xl flex items-center justify-center gap-2 transition-colors border-b border-white z-0" id="nutrition-tab-{{ forloop.counter }}" data-bs-toggle="tab" data-bs-target="#nutrition-content-{{ forloop.counter }}" type="button" role="tab" style="border-radius: 1rem 1rem 0 0; color: #ffffff !important;">
         <i class="fas fa-leaf"></i> Nutrition
       </button>
     </li>
@@ -150,23 +150,23 @@
     <!-- RECIPE TAB CONTENT -->
     <div class="tab-pane fade show active" id="recipe-content-{{ forloop.counter }}" role="tabpanel">
       
-      <h5 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+      <h5 class="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
         <i class="fas fa-shopping-basket text-orange-500"></i> Ingredients
       </h5>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for ing in recipe.ingredients %}
-        <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow" style="border:1px solid #e2e8f0;">
-          <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-white shadow-sm" style="background:{% if ing.have %}#dcfce7{% else %}#ffedd5{% endif %}; min-width:2rem;">
+        <div style="background:#ffffff; border:2px solid #e2e8f0; border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
+          <div style="width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:{% if ing.have %}#dcfce7{% else %}#ffedd5{% endif %};">
             {% if ing.have %}
-            <i class="fas fa-check text-xs" style="color:#16a34a;"></i>
+            <i class="fas fa-check" style="color:#16a34a; font-size:0.75rem;"></i>
             {% else %}
-            <i class="fas fa-times text-xs" style="color:#ea580c;"></i>
+            <i class="fas fa-times" style="color:#ea580c; font-size:0.75rem;"></i>
             {% endif %}
           </div>
           <div>
-            <div style="color:#0f172a; font-size:0.9rem; font-weight:700; line-height:1.3;">{% if ing.text %}{{ ing.text }}{% else %}{{ ing }}{% endif %}</div>
+            <div style="color:#000000; font-size:0.95rem; font-weight:800; line-height:1.3; font-family:'Poppins',sans-serif;">{% if ing.text %}{{ ing.text }}{% else %}{{ ing }}{% endif %}</div>
             {% if ing.measurement %}
-            <div style="color:#475569; font-size:0.78rem; font-weight:600; margin-top:3px;">{{ ing.measurement }}</div>
+            <div style="color:#374151; font-size:0.8rem; font-weight:700; margin-top:2px; font-family:'Poppins',sans-serif;">{{ ing.measurement }}</div>
             {% endif %}
           </div>
         </div>
@@ -175,14 +175,14 @@
       
       <div class="my-8 border-t border-slate-100"></div>
 
-      <h5 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+      <h5 class="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
         <i class="fas fa-list-ol text-emerald-500"></i> Instructions
       </h5>
       <div class="flex flex-col gap-4">
         {% for step in recipe.instructions %}
-        <div class="flex gap-4 p-5 rounded-2xl" style="background:#f8fafc; border:1px solid #e2e8f0;">
-          <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white shadow-md mt-0.5" style="background:#064E3B; min-width:2rem;">{{ forloop.counter }}</div>
-          <div style="color:#1e293b; font-size:0.95rem; font-weight:600; line-height:1.7; padding-top:2px;">{{ step }}</div>
+        <div style="display:flex; gap:14px; padding:16px; border-radius:16px; background:#f8fafc; border:2px solid #e2e8f0;">
+          <div style="width:34px; height:34px; min-width:34px; border-radius:50%; background:#064E3B; color:#ffffff; font-size:0.9rem; font-weight:900; display:flex; align-items:center; justify-content:center; margin-top:2px;">{{ forloop.counter }}</div>
+          <div style="color:#111827; font-size:0.97rem; font-weight:700; line-height:1.7; font-family:'Poppins',sans-serif; padding-top:4px;">{{ step }}</div>
         </div>
         {% endfor %}
       </div>
