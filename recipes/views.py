@@ -21,9 +21,7 @@ import urllib.request
 import json
 import re
 from dotenv import load_dotenv
-
-from .nutrition_service import get_nutrition_for_ingredient, parse_quantity_to_grams
-
+from .nutrition_service import calculate_nutrition
 load_dotenv()
 
 client = Groq(api_key=os.getenv('GROQ_API_KEY'))
@@ -749,13 +747,12 @@ def calculate_recipe_nutrition(ingredients_list, servings):
         name = ing.get('text', '')
         measure = ing.get('measurement', '')
         full_str = f"{measure} {name}".strip()
-        grams = parse_quantity_to_grams(measure, name)
         
-        nutri = get_nutrition_for_ingredient(name, grams)
+        nutri = calculate_nutrition(name, measure)
         return {
             'name': name,
             'quantity': full_str,
-            'grams': grams,
+            'grams': nutri.get('grams', 100),
             'nutrition': nutri
         }
         
