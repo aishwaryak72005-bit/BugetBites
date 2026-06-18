@@ -4,188 +4,343 @@
 
 {% block content %}
 <style>
-  /* Premium Dark Glassmorphism UI */
+  /* Ultra-Premium Dark Glassmorphism */
+  body {
+    background-color: #020617; /* Slate 950 */
+  }
   .premium-bg {
-    background: radial-gradient(circle at top right, #1E1B4B, #0F172A, #000000);
+    background: radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.15), transparent 40%),
+                radial-gradient(circle at 20% 100%, rgba(245, 158, 11, 0.15), transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1), transparent 60%);
     min-height: calc(100vh - 70px);
     color: white;
     font-family: 'Inter', sans-serif;
-    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow-x: hidden;
   }
   
-  /* Markdown Styling for Cravings Output */
-  #finalInstructions {
-    font-size: 1.05rem;
+  /* Floating orbs in background */
+  .premium-bg::before, .premium-bg::after {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: 0;
+    animation: float 20s infinite alternate;
   }
-  #finalInstructions h3, #finalInstructions h4 {
-    color: #FBBF24;
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-    font-weight: 800;
+  .premium-bg::before {
+    background: rgba(245, 158, 11, 0.2);
+    top: 10%;
+    left: 10%;
   }
-  #finalInstructions p {
-    margin-bottom: 1rem;
+  .premium-bg::after {
+    background: rgba(16, 185, 129, 0.2);
+    bottom: 10%;
+    right: 10%;
+    animation-delay: -10s;
   }
-  #finalInstructions ul, #finalInstructions ol {
-    margin-bottom: 1rem;
-    padding-left: 1.5rem;
+  
+  @keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -50px) scale(1.1); }
+    100% { transform: translate(-30px, 20px) scale(0.9); }
   }
-  #finalInstructions li {
-    margin-bottom: 0.5rem;
+
+  .container { position: relative; z-index: 1; }
+
+  .glass-card {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: slideUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
   }
-  #finalInstructions strong {
+  
+  @keyframes slideUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .premium-gradient-text {
+    background: linear-gradient(to right, #FCD34D, #F59E0B, #EA580C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+  }
+  
+  .pro-badge {
+    background: linear-gradient(135deg, #F59E0B, #EA580C);
+    color: white;
+    font-weight: 900;
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .input-glass {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 20px;
+    padding: 18px 24px;
+    font-size: 1.15rem;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .input-glass:focus {
+    background: rgba(15, 23, 42, 0.8);
+    border-color: #F59E0B;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.15), inset 0 2px 4px rgba(0,0,0,0.2);
+    color: white;
+    transform: translateY(-2px);
+  }
+  .input-glass::placeholder { color: rgba(255, 255, 255, 0.3); }
+  
+  select.input-glass option {
+    background-color: #0F172A;
     color: white;
   }
 
-  .glass-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  }
-  .premium-gradient-text {
-    background: linear-gradient(135deg, #FBBF24, #F59E0B, #D97706);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .pro-badge {
-    background: linear-gradient(135deg, #FBBF24, #D97706);
-    color: #000;
-    font-weight: 900;
-    font-size: 0.75rem;
-    padding: 4px 10px;
-    border-radius: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-  .input-glass {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    border-radius: 16px;
-    padding: 16px 20px;
-    font-size: 1.1rem;
-    transition: all 0.3s;
-  }
-  .input-glass:focus {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: #FBBF24;
-    outline: none;
-    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1);
-    color: white;
-  }
-  .input-glass::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-  }
   .btn-premium {
-    background: linear-gradient(135deg, #F59E0B, #D97706);
+    background: linear-gradient(135deg, #F59E0B, #EA580C);
     color: white;
     font-weight: 800;
     border: none;
-    border-radius: 16px;
-    padding: 16px;
+    border-radius: 20px;
+    padding: 18px;
     font-size: 1.1rem;
-    transition: all 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-premium::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+    transform: skewX(-20deg);
+    transition: all 0.5s;
   }
   .btn-premium:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 30px -5px rgba(245, 158, 11, 0.5);
   }
+  .btn-premium:hover::after { left: 150%; }
+
+  /* Interactive Ingredient Pills */
   .ingredient-item {
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
   }
   .ingredient-item:hover {
-    background: rgba(255,255,255,0.05);
+    background: rgba(30, 41, 59, 0.8);
+    transform: translateX(5px);
+    border-color: rgba(255,255,255,0.15);
+  }
+  .ingredient-item.checked {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+  }
+  .ingredient-item.checked::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: #10B981;
+  }
+  .ingredient-item.missing {
+    background: rgba(244, 63, 94, 0.1);
+    border-color: rgba(244, 63, 94, 0.3);
+  }
+  .ingredient-item.missing::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: #F43F5E;
+  }
+
+  /* Custom Checkbox Hidden */
+  .ing-checkbox { display: none; }
+  
+  .ing-status-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
+    font-size: 0.8rem;
+  }
+  .checked .ing-status-icon {
+    background: #10B981; color: white;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  }
+  .missing .ing-status-icon {
+    background: transparent; color: #F43F5E; border: 2px dashed #F43F5E;
+  }
+
+  .sub-input-container {
+    margin-top: 10px;
+    display: none;
+    animation: fadeIn 0.3s ease;
   }
   .sub-input {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(244, 63, 94, 0.3);
     color: white;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    width: 100%;
+    transition: all 0.2s;
   }
-  
+  .sub-input:focus {
+    outline: none; border-color: #F43F5E;
+    box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
   /* Loader */
-  .pro-loader {
-    width: 48px;
-    height: 48px;
-    border: 4px solid rgba(251, 191, 36, 0.2);
-    border-top-color: #FBBF24;
+  .pulse-loader {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, #F59E0B, #EA580C);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
     margin: 0 auto;
+    animation: pulse 1.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: white;
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
   }
-  @keyframes spin { 100% { transform: rotate(360deg); } }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 50px rgba(245, 158, 11, 0.6); }
+  }
+
+  /* Stunning Timeline Instructions */
+  .timeline {
+    position: relative;
+    padding-left: 30px;
+    margin-top: 20px;
+  }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; top: 10px; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, #F59E0B, rgba(245, 158, 11, 0.1));
+  }
+  .timeline-step {
+    position: relative;
+    margin-bottom: 2rem;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 20px;
+    transition: all 0.3s;
+    animation: slideLeft 0.5s ease backwards;
+  }
+  .timeline-step:hover {
+    background: rgba(30, 41, 59, 0.6);
+    transform: translateX(5px);
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+  .timeline-step::before {
+    content: ''; position: absolute; left: -36px; top: 20px; width: 14px; height: 14px;
+    border-radius: 50%; background: #F59E0B;
+    box-shadow: 0 0 10px #F59E0B, 0 0 0 4px rgba(15, 23, 42, 1);
+  }
+  @keyframes slideLeft { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+  .timeline-step h3, .timeline-step h4 {
+    color: #FCD34D; font-weight: 800; margin-bottom: 10px; margin-top: 0; font-size: 1.2rem;
+  }
+  .timeline-step p { color: #CBD5E1; line-height: 1.7; margin-bottom: 0; }
+  .timeline-step ul { padding-left: 1.2rem; color: #94A3B8; margin-top: 10px; }
+  .timeline-step li { margin-bottom: 6px; }
+  .timeline-step strong { color: white; }
+
 </style>
 
 <div class="premium-bg py-5">
   <div class="container">
     <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-6">
+      <div class="col-md-8 col-lg-7">
         
-        <div class="text-center mb-4">
-          <span class="pro-badge mb-2 d-inline-block">Pro Feature</span>
-          <h1 class="fw-bolder mb-2 premium-gradient-text" style="font-size: 2.5rem;">Craving Mode</h1>
-          <p class="text-white-50" style="font-size: 1.1rem;">Tell the AI Chef exactly what you want to eat, and it will help you cook it with whatever you have.</p>
+        <div class="text-center mb-5" style="animation: slideUp 0.6s ease-out backwards;">
+          <span class="pro-badge mb-3"><i class="fas fa-crown"></i> Premium Magic</span>
+          <h1 class="fw-bolder mb-3 premium-gradient-text" style="font-size: 3rem; letter-spacing: -1px;">Craving Mode</h1>
+          <p class="text-slate-300" style="font-size: 1.15rem; max-width: 500px; margin: 0 auto; line-height: 1.6;">Tell the AI Chef exactly what you want to eat, and it will adapt the recipe using whatever you have.</p>
         </div>
 
-        <div class="glass-card p-4 p-md-5 mb-4" id="step1-card">
+        <!-- Step 1: Input -->
+        <div class="glass-card p-4 p-md-5 mb-5" id="step1-card">
           <form id="cravingsForm">
             {% csrf_token %}
             <div class="mb-4">
-              <label class="form-label text-white-50 fw-bold mb-2">What are you craving?</label>
-              <input type="text" id="cravingInput" class="form-control input-glass" placeholder="e.g. Garlic Bread, Butter Chicken..." required>
+              <label class="form-label text-slate-300 fw-bold mb-3 ms-2" style="font-size: 1.1rem;"><i class="fas fa-utensils text-amber-500 me-2"></i> What are you craving?</label>
+              <input type="text" id="cravingInput" class="form-control input-glass" placeholder="e.g. Creamy Mushroom Pasta, Butter Chicken..." required>
             </div>
-            <div class="mb-4">
-              <label class="form-label text-white-50 fw-bold mb-2">How many people are eating?</label>
-              <select id="servingInput" class="form-select input-glass" style="appearance: none;">
-                <option value="1" style="color: black;">1 Person</option>
-                <option value="2" style="color: black;" selected>2 People</option>
-                <option value="4" style="color: black;">4 People</option>
-                <option value="6" style="color: black;">6+ People</option>
+            <div class="mb-5">
+              <label class="form-label text-slate-300 fw-bold mb-3 ms-2" style="font-size: 1.1rem;"><i class="fas fa-users text-amber-500 me-2"></i> How many people?</label>
+              <select id="servingInput" class="form-select input-glass">
+                <option value="1">1 Person (Solo Feast)</option>
+                <option value="2" selected>2 People (Couple's Dinner)</option>
+                <option value="4">4 People (Family Meal)</option>
+                <option value="6">6+ People (Party Time)</option>
               </select>
             </div>
-            <button type="submit" class="btn btn-premium w-100 d-flex align-items-center justify-content-center gap-2">
-              <i class="fas fa-magic"></i> Generate Checklist
+            <button type="submit" class="btn btn-premium w-100 d-flex align-items-center justify-content-center gap-3 shadow-lg">
+              <i class="fas fa-wand-magic-sparkles"></i> Conjure Checklist
             </button>
           </form>
         </div>
 
         <!-- Loading State -->
-        <div id="loadingState" class="text-center py-5" style="display: none;">
-          <div class="pro-loader mb-3"></div>
-          <h5 class="fw-bold premium-gradient-text" id="loadingText">Analyzing your craving...</h5>
+        <div id="loadingState" class="text-center py-5" style="display: none; animation: fadeIn 0.5s ease;">
+          <div class="pulse-loader mb-4"><i class="fas fa-fire"></i></div>
+          <h4 class="fw-bold premium-gradient-text" id="loadingText">Analyzing your craving...</h4>
+          <p class="text-slate-400 mt-2">Our AI is designing the perfect recipe.</p>
         </div>
 
         <!-- Step 2: The Checklist -->
-        <div class="glass-card p-4 p-md-5 mb-4" id="step2-card" style="display: none;">
-          <h3 class="fw-bold mb-1">Your Checklist</h3>
-          <p class="text-white-50 mb-4">Select what you have. If you're missing something, type what you have instead!</p>
+        <div class="glass-card p-4 p-md-5 mb-5" id="step2-card" style="display: none;">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold border border-amber-500/30">2</div>
+            <h2 class="fw-bold mb-0 text-white">Your Checklist</h2>
+          </div>
+          <p class="text-slate-300 mb-4" style="font-size: 1.1rem;">Tap to mark what you <b class="text-emerald-400">have</b>. If you're missing something, tap it to add a <b class="text-rose-400">substitute</b>!</p>
           
-          <div id="checklistContainer"></div>
+          <div id="checklistContainer" class="mb-5"></div>
           
-          <button id="cookBtn" class="btn btn-premium w-100 mt-4 d-flex align-items-center justify-content-center gap-2">
-            <i class="fas fa-fire"></i> Start Cooking
+          <button id="cookBtn" class="btn btn-premium w-100 mt-2 d-flex align-items-center justify-content-center gap-3">
+            <i class="fas fa-blender"></i> Adapt & Start Cooking
           </button>
         </div>
 
         <!-- Step 3: Final Instructions -->
-        <div class="glass-card p-4 p-md-5 mb-4" id="step3-card" style="display: none;">
-          <h3 class="fw-bold mb-3 premium-gradient-text" id="finalTitle">Let's Cook!</h3>
-          <div id="finalInstructions" class="text-white-50" style="line-height: 1.8;"></div>
+        <div class="glass-card p-4 p-md-5 mb-5" id="step3-card" style="display: none;">
+          <div class="text-center mb-5">
+            <span class="pro-badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mb-3"><i class="fas fa-check-circle"></i> Recipe Adapted</span>
+            <h2 class="fw-bolder mb-2 premium-gradient-text" id="finalTitle" style="font-size: 2.5rem;">Let's Cook!</h2>
+            <p class="text-slate-400">Customized perfectly for your ingredients.</p>
+          </div>
+          <div id="finalInstructions" class="timeline"></div>
         </div>
 
       </div>
@@ -193,6 +348,7 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 document.getElementById('cravingsForm').addEventListener('submit', function(e) {
   e.preventDefault();
@@ -218,31 +374,49 @@ document.getElementById('cravingsForm').addEventListener('submit', function(e) {
     container.innerHTML = '';
     
     data.ingredients.forEach((ing, index) => {
+      let delay = index * 0.1;
       container.innerHTML += `
-        <div class="ingredient-item">
-          <div class="d-flex align-items-center gap-3">
-            <input class="form-check-input mt-0" type="checkbox" id="check_${index}" value="" style="transform: scale(1.3);" checked onchange="toggleSub(this, ${index})">
-            <label class="form-check-label fw-bold" for="check_${index}">${ing.amount} ${ing.name}</label>
+        <div class="ingredient-item checked" id="ing_item_${index}" style="animation: slideLeft 0.5s ease backwards; animation-delay: ${delay}s" onclick="toggleIng(${index})">
+          <input class="ing-checkbox" type="checkbox" id="check_${index}" checked>
+          <div class="d-flex align-items-center gap-3 w-100">
+            <div class="ing-status-icon"><i class="fas fa-check" id="icon_${index}"></i></div>
+            <div class="flex-grow-1">
+              <label class="fw-bold text-white mb-0" style="cursor:pointer; font-size:1.1rem;">${ing.amount} ${ing.name}</label>
+              <div class="sub-input-container" id="sub_container_${index}" onclick="event.stopPropagation();">
+                <input type="text" id="sub_${index}" class="sub-input" placeholder="What will you use instead?">
+              </div>
+            </div>
           </div>
-          <input type="text" id="sub_${index}" class="sub-input" placeholder="Substitute with..." style="display: none; width: 45%;">
         </div>
       `;
     });
     
-    // Store data globally
     window.cravingData = data;
     document.getElementById('step2-card').style.display = 'block';
   });
 });
 
-function toggleSub(checkbox, index) {
+function toggleIng(index) {
+  const checkbox = document.getElementById('check_' + index);
+  const item = document.getElementById('ing_item_' + index);
+  const icon = document.getElementById('icon_' + index);
+  const subContainer = document.getElementById('sub_container_' + index);
   const subInput = document.getElementById('sub_' + index);
+  
+  checkbox.checked = !checkbox.checked;
+  
   if (checkbox.checked) {
-    subInput.style.display = 'none';
+    item.classList.remove('missing');
+    item.classList.add('checked');
+    icon.className = 'fas fa-check';
+    subContainer.style.display = 'none';
     subInput.value = '';
   } else {
-    subInput.style.display = 'block';
-    subInput.focus();
+    item.classList.remove('checked');
+    item.classList.add('missing');
+    icon.className = 'fas fa-times';
+    subContainer.style.display = 'block';
+    setTimeout(() => subInput.focus(), 100);
   }
 }
 
@@ -264,7 +438,7 @@ document.getElementById('cookBtn').addEventListener('click', function() {
 
   document.getElementById('step2-card').style.display = 'none';
   document.getElementById('loadingState').style.display = 'block';
-  document.getElementById('loadingText').innerText = 'Adapting recipe for your ingredients...';
+  document.getElementById('loadingText').innerText = 'Adapting recipe & generating timeline...';
 
   fetch('/api/cravings/instructions/', {
     method: 'POST',
@@ -284,8 +458,39 @@ document.getElementById('cookBtn').addEventListener('click', function() {
     document.getElementById('step3-card').style.display = 'block';
     document.getElementById('finalTitle').innerText = document.getElementById('cravingInput').value;
     
-    let html = marked.parse(data.instructions);
-    document.getElementById('finalInstructions').innerHTML = html;
+    // Custom Markdown Parsing to Timeline Items
+    let rawHtml = marked.parse(data.instructions);
+    
+    // We wrap h3, h4 tags inside timeline-step divs to create the timeline visual
+    let timelineHtml = '';
+    
+    // Splitting by H3 or H4 using regex and wrapping them in cards
+    let parts = rawHtml.split(/(<h[34].*?>.*?<\/h[34]>)/i);
+    
+    if (parts.length > 1) {
+      // It has headers!
+      let currentCard = '';
+      for(let i=0; i<parts.length; i++) {
+        let p = parts[i];
+        if (/<h[34]/.test(p)) {
+           // If we already have a card, push it
+           if (currentCard) { timelineHtml += `<div class="timeline-step">${currentCard}</div>`; }
+           currentCard = p;
+        } else {
+           if (currentCard) { currentCard += p; }
+           else {
+             // Intro text before first header
+             if (p.trim()) timelineHtml += `<div class="mb-4 text-slate-300">${p}</div>`;
+           }
+        }
+      }
+      if (currentCard) { timelineHtml += `<div class="timeline-step">${currentCard}</div>`; }
+    } else {
+      // Fallback if AI didn't use headers
+      timelineHtml = `<div class="timeline-step">${rawHtml}</div>`;
+    }
+    
+    document.getElementById('finalInstructions').innerHTML = timelineHtml;
   });
 });
 </script>
