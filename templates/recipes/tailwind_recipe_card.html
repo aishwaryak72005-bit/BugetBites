@@ -242,7 +242,7 @@ function fetchCookingTips(recipeName, ingredients) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            'X-CSRFToken': '{{ csrf_token }}'
         },
         body: JSON.stringify({recipe: recipeName, ingredients: ingredients})
     })
