@@ -1,0 +1,160 @@
+<div class="nutrition-card p-6 rounded-3xl bg-white shadow-xl border border-slate-100 mt-6 relative overflow-hidden">
+  
+  <!-- Powered by USDA badge -->
+  <div class="absolute top-4 right-4 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-blue-200">
+    <i class="fas fa-database mr-1"></i> Powered by USDA
+  </div>
+
+  <h4 class="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
+    <i class="fas fa-leaf text-emerald-500"></i> Nutrition Profile
+  </h4>
+
+  {% if recipe.real_nutrition %}
+    {% with nut=recipe.real_nutrition %}
+
+    <!-- SECTION 2: Macro Highlights -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+      <div class="bg-orange-50 border border-orange-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+        <div class="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-1">Calories</div>
+        <div class="text-2xl font-black text-orange-600">{{ nut.per_serving.calories|default:"0" }}</div>
+      </div>
+      <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+        <div class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Protein</div>
+        <div class="text-2xl font-black text-blue-600">{{ nut.per_serving.protein|default:"0" }}g</div>
+      </div>
+      <div class="bg-yellow-50 border border-yellow-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+        <div class="text-[10px] font-black text-yellow-500 uppercase tracking-widest mb-1">Fat</div>
+        <div class="text-2xl font-black text-yellow-600">{{ nut.per_serving.fat|default:"0" }}g</div>
+      </div>
+      <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+        <div class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Carbs</div>
+        <div class="text-2xl font-black text-emerald-600">{{ nut.per_serving.carbs|default:"0" }}g</div>
+      </div>
+      <div class="bg-red-50 border border-red-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center col-span-2 md:col-span-1">
+        <div class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">Sodium</div>
+        <div class="text-2xl font-black text-red-600">{{ nut.per_serving.sodium|default:"0" }}mg</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <!-- SECTION 3: Pie Chart -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col items-center">
+        <h6 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Macro Distribution</h6>
+        <div class="relative w-40 h-40">
+          <canvas id="macroChart-{{ forloop.counter }}"></canvas>
+        </div>
+      </div>
+
+      <!-- SECTION 4: Health Score -->
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center">
+        <h6 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4">Health Score</h6>
+        {% if nut.health_score > 70 %}
+          <div class="w-32 h-32 rounded-full border-8 border-emerald-400 flex items-center justify-center text-3xl font-black text-emerald-600 shadow-inner bg-white">
+            {{ nut.health_score }}
+          </div>
+        {% elif nut.health_score > 50 %}
+          <div class="w-32 h-32 rounded-full border-8 border-yellow-400 flex items-center justify-center text-3xl font-black text-yellow-600 shadow-inner bg-white">
+            {{ nut.health_score }}
+          </div>
+        {% else %}
+          <div class="w-32 h-32 rounded-full border-8 border-red-400 flex items-center justify-center text-3xl font-black text-red-600 shadow-inner bg-white">
+            {{ nut.health_score }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- SECTION 5 & 6: Tags -->
+    <div class="mb-8">
+      <h6 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Smart Tags</h6>
+      <div class="flex flex-wrap gap-2 mb-4">
+        {% for tag in nut.health_tags %}
+          <span class="bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+          <div class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2"><i class="fas fa-check-circle"></i> Great For</div>
+          <ul class="text-sm font-semibold text-emerald-800 space-y-1">
+            {% for is_tag in nut.suitability.is %}
+              <li>• {{ is_tag }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% if nut.suitability.is_not %}
+        <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+          <div class="text-[10px] font-black text-red-600 uppercase tracking-widest mb-2"><i class="fas fa-times-circle"></i> Not Recommended For</div>
+          <ul class="text-sm font-semibold text-red-800 space-y-1">
+            {% for is_not_tag in nut.suitability.is_not %}
+              <li>• {{ is_not_tag }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- SECTION 1: Breakdown Table -->
+    <h6 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Ingredient Breakdown</h6>
+    <div class="overflow-x-auto bg-white border border-slate-200 rounded-xl shadow-sm">
+      <table class="w-full text-left text-sm whitespace-nowrap">
+        <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+          <tr>
+            <th class="px-4 py-3">Ingredient</th>
+            <th class="px-4 py-3">Qty</th>
+            <th class="px-4 py-3">Cals</th>
+            <th class="px-4 py-3">Pro (g)</th>
+            <th class="px-4 py-3">Fat (g)</th>
+            <th class="px-4 py-3">Carb (g)</th>
+            <th class="px-4 py-3">Sod (mg)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 font-semibold text-slate-700">
+          {% for item in nut.ingredients %}
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3 text-slate-900">{{ item.name }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ item.quantity }}</td>
+            <td class="px-4 py-3 text-orange-500">{{ item.nutrition.calories }}</td>
+            <td class="px-4 py-3 text-blue-500">{{ item.nutrition.protein }}</td>
+            <td class="px-4 py-3 text-yellow-500">{{ item.nutrition.fat }}</td>
+            <td class="px-4 py-3 text-emerald-500">{{ item.nutrition.carbs }}</td>
+            <td class="px-4 py-3 text-red-500">{{ item.nutrition.sodium }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('macroChart-{{ forloop.counter }}');
+        if(ctx) {
+          new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+              labels: ['Protein', 'Fat', 'Carbs'],
+              datasets: [{
+                data: [{{ nut.per_serving.protein }}, {{ nut.per_serving.fat }}, {{ nut.per_serving.carbs }}],
+                backgroundColor: ['#3B82F6', '#EAB308', '#10B981'],
+                borderWidth: 0
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+            }
+          });
+        }
+      });
+    </script>
+    {% endwith %}
+  {% else %}
+    <div class="text-center p-8 bg-slate-50 rounded-2xl border border-slate-200">
+      <i class="fas fa-spinner fa-spin text-3xl text-slate-300 mb-3"></i>
+      <p class="text-slate-500 font-bold">Nutrition calculation failed or USDA API was unavailable.</p>
+    </div>
+  {% endif %}
+</div>

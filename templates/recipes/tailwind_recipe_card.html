@@ -127,21 +127,29 @@
     {% endif %}
   </div>
 
-  <!-- Tabs (Connecting Green to White) -->
-  <div class="flex px-6 pt-2">
-    <button id="tab-btn-ing-{{ forloop.counter }}" onclick="switchTabTailwind('{{ forloop.counter }}', 'ingredients')" class="flex-1 py-4 text-sm font-black text-emerald-900 bg-white rounded-t-2xl flex items-center justify-center gap-2 transition-colors shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-10">
-      <i class="fas fa-shopping-basket text-orange-500"></i> Ingredients
-    </button>
-    <button id="tab-btn-inst-{{ forloop.counter }}" onclick="switchTabTailwind('{{ forloop.counter }}', 'instructions')" class="flex-1 py-4 text-sm font-bold text-emerald-200 bg-emerald-800/50 hover:bg-emerald-800 rounded-t-2xl flex items-center justify-center gap-2 transition-colors border-b border-white">
-      <i class="fas fa-list-ol"></i> Instructions
-    </button>
-  </div>
+  <!-- BOOTSTRAP 5 TABS -->
+  <ul class="nav nav-pills px-6 pt-2 flex gap-2 border-0" id="recipeTabs-{{ forloop.counter }}" role="tablist">
+    <li class="nav-item flex-1" role="presentation">
+      <button class="nav-link active w-full py-4 text-sm font-black text-emerald-900 bg-white rounded-t-2xl flex items-center justify-center gap-2 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-10" id="recipe-tab-{{ forloop.counter }}" data-bs-toggle="tab" data-bs-target="#recipe-content-{{ forloop.counter }}" type="button" role="tab" style="border-radius: 1rem 1rem 0 0;">
+        <i class="fas fa-utensils text-orange-500"></i> Recipe
+      </button>
+    </li>
+    <li class="nav-item flex-1" role="presentation">
+      <button class="nav-link w-full py-4 text-sm font-bold text-emerald-200 bg-emerald-800/50 hover:bg-emerald-800 rounded-t-2xl flex items-center justify-center gap-2 transition-colors border-b border-white z-0" id="nutrition-tab-{{ forloop.counter }}" data-bs-toggle="tab" data-bs-target="#nutrition-content-{{ forloop.counter }}" type="button" role="tab" style="border-radius: 1rem 1rem 0 0;">
+        <i class="fas fa-leaf"></i> Nutrition
+      </button>
+    </li>
+  </ul>
 
   <!-- White Content Panel -->
-  <div class="bg-white text-slate-800 px-6 sm:px-8 pb-8 pt-6 relative z-10">
+  <div class="tab-content bg-white text-slate-800 px-6 sm:px-8 pb-8 pt-6 relative z-10" id="recipeTabsContent-{{ forloop.counter }}">
     
-    <!-- INGREDIENTS TAB -->
-    <div id="tab-ing-{{ forloop.counter }}">
+    <!-- RECIPE TAB CONTENT -->
+    <div class="tab-pane fade show active" id="recipe-content-{{ forloop.counter }}" role="tabpanel">
+      
+      <h5 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+        <i class="fas fa-shopping-basket text-orange-500"></i> Ingredients
+      </h5>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {% for ing in recipe.ingredients %}
         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
@@ -159,10 +167,13 @@
         </div>
         {% endfor %}
       </div>
-    </div>
+      </div>
+      
+      <div class="my-8 border-t border-slate-100"></div>
 
-    <!-- INSTRUCTIONS TAB -->
-    <div id="tab-inst-{{ forloop.counter }}" class="hidden">
+      <h5 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+        <i class="fas fa-list-ol text-emerald-500"></i> Instructions
+      </h5>
       <div class="flex flex-col gap-4">
         {% for step in recipe.instructions %}
         <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex gap-4 shadow-sm">
@@ -175,32 +186,13 @@
         </div>
         {% endfor %}
       </div>
-    </div>
+      </div>
+    </div> <!-- END RECIPE TAB CONTENT -->
 
-    <!-- Nutrition Facts (Inside White Area) -->
-    {% if recipe.nutrition %}
-    <h6 class="text-xs font-black text-slate-400 uppercase tracking-widest mt-10 mb-4 flex items-center gap-2">
-      <i class="fas fa-bolt text-orange-400"></i> Nutrition profile
-    </h6>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-      <div class="bg-orange-50 border border-orange-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
-        <div class="text-2xl font-black text-orange-600">{{ recipe.nutrition.calories|default:"-" }}{% if recipe.nutrition.calories %} kcal{% endif %}</div>
-        <div class="text-[10px] font-black text-orange-400/80 uppercase tracking-widest mt-1" style="color: #F6AD55 !important;">Calories</div>
-      </div>
-      <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
-        <div class="text-2xl font-black text-emerald-600">{{ recipe.nutrition.protein|default:"-" }}{% if recipe.nutrition.protein %}g{% endif %}</div>
-        <div class="text-[10px] font-black text-emerald-400/80 uppercase tracking-widest mt-1" style="color: #34D399 !important;">Protein</div>
-      </div>
-      <div class="bg-sky-50 border border-sky-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
-        <div class="text-2xl font-black text-sky-600">{{ recipe.nutrition.carbs|default:"-" }}{% if recipe.nutrition.carbs %}g{% endif %}</div>
-        <div class="text-[10px] font-black text-sky-400/80 uppercase tracking-widest mt-1" style="color: #38BDF8 !important;">Carbs</div>
-      </div>
-      <div class="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex flex-col items-center justify-center shadow-sm">
-        <div class="text-2xl font-black text-rose-600">{{ recipe.nutrition.fat|default:"-" }}{% if recipe.nutrition.fat %}g{% endif %}</div>
-        <div class="text-[10px] font-black text-rose-400/80 uppercase tracking-widest mt-1" style="color: #FB7185 !important;">Fat</div>
-      </div>
-    </div>
-    {% endif %}
+    <!-- NUTRITION TAB CONTENT -->
+    <div class="tab-pane fade" id="nutrition-content-{{ forloop.counter }}" role="tabpanel">
+      {% include 'recipes/nutrition_card.html' %}
+    </div> <!-- END NUTRITION TAB CONTENT -->
 
     <!-- Missing Ingredients -->
     {% if recipe.missing %}
@@ -227,34 +219,7 @@
 
 {% if forloop.first %}
 <script>
-function switchTabTailwind(recipeId, tabName) {
-  const tabIng = document.getElementById(`tab-ing-${recipeId}`);
-  const tabInst = document.getElementById(`tab-inst-${recipeId}`);
-  const btnIng = document.getElementById(`tab-btn-ing-${recipeId}`);
-  const btnInst = document.getElementById(`tab-btn-inst-${recipeId}`);
-
-  // Base active/inactive classes
-  const activeClass = "flex-1 py-4 text-sm font-black text-emerald-900 bg-white rounded-t-2xl flex items-center justify-center gap-2 transition-colors shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-10 border-b-0";
-  const inactiveClass = "flex-1 py-4 text-sm font-bold text-emerald-200 bg-emerald-800/50 hover:bg-emerald-800 rounded-t-2xl flex items-center justify-center gap-2 transition-colors border-b border-white z-0";
-
-  if(tabName === 'ingredients') {
-    tabIng.classList.remove('hidden');
-    tabInst.classList.add('hidden');
-    
-    btnIng.className = activeClass;
-    btnInst.className = inactiveClass;
-    btnIng.innerHTML = '<i class="fas fa-shopping-basket text-orange-500"></i> Ingredients';
-    btnInst.innerHTML = '<i class="fas fa-list-ol"></i> Instructions';
-  } else {
-    tabIng.classList.add('hidden');
-    tabInst.classList.remove('hidden');
-    
-    btnInst.className = activeClass;
-    btnIng.className = inactiveClass;
-    btnInst.innerHTML = '<i class="fas fa-list-ol text-orange-500"></i> Instructions';
-    btnIng.innerHTML = '<i class="fas fa-shopping-basket"></i> Ingredients';
-  }
-}
+// We use Bootstrap 5 tabs now, so switchTabTailwind is removed to prevent conflicts.
 
 function startCookingModeFallback(element, recipeName) {
     if (typeof window.startCookingMode === 'function') {

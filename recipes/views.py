@@ -17,10 +17,15 @@ def is_user_premium(user):
 import os
 import requests
 import urllib.parse as _urlparse
+from bs4 import BeautifulSoup
+from functools import lru_cache
+from math import log, exp
 import urllib.request
 import json
 import re
 from dotenv import load_dotenv
+
+from .nutrition_service import get_nutrition_for_ingredient, parse_quantity_to_grams
 
 load_dotenv()
 
@@ -729,6 +734,73 @@ Reply ONLY with this exact format — nothing else:
 
 
 @login_required(login_url='/login/')
+def calculate_recipe_nutrition(ingredients_list, servings):
+    total = {
+        'calories': 0.0, 'protein': 0.0, 'fat': 0.0, 'carbs': 0.0,
+        'fiber': 0.0, 'sugar': 0.0, 'sodium': 0.0, 'cholesterol': 0.0, 'saturated_fat': 0.0
+    }
+    
+    ingredient_details = []
+    
+    for ing in ingredients_list:
+        # ing is dict with 'text' and 'measurement'
+        name = ing.get('text', '')
+        measure = ing.get('measurement', '')
+        full_str = f"{measure} {name}".strip()
+        grams = parse_quantity_to_grams(full_str)
+        
+        nutri = get_nutrition_for_ingredient(name, grams)
+        
+        ingredient_details.append({
+            'name': name,
+            'quantity': full_str,
+            'grams': grams,
+            'nutrition': nutri
+        })
+        
+        for k in total.keys():
+            total[k] += nutri.get(k, 0.0)
+            
+    # Per serving
+    per_serving = {k: round(v / max(1, servings), 1) for k, v in total.items()}
+    
+    # Calculate health score
+    score = 100
+    if per_serving['sodium'] > 600: score -= 10
+    if per_serving['saturated_fat'] > 5: score -= 10
+    if per_serving['sugar'] > 10: score -= 5
+    if per_serving['protein'] > 20: score += 10
+    if per_serving['fiber'] > 3: score += 5
+    score = max(0, min(100, score)) # clamp 0-100
+    
+    # Smart Health Tags
+    tags = []
+    if per_serving['protein'] > 20: tags.append("✅ High Protein")
+    if per_serving['carbs'] < 20: tags.append("✅ Low Carb")
+    if per_serving['sodium'] < 400: tags.append("✅ Low Sodium")
+    if per_serving['cholesterol'] > 300: tags.append("⚠️ High Cholesterol")
+    if per_serving['protein'] > 25: tags.append("💪 Muscle Building")
+    if per_serving['calories'] < 400: tags.append("🏃 Weight Loss Friendly")
+    
+    # Suitability
+    suitability = {"is": [], "is_not": []}
+    if "✅ Low Carb" in tags: suitability["is"].append("Keto / Low-Carb Diets")
+    if "💪 Muscle Building" in tags: suitability["is"].append("Athletes / Bodybuilders")
+    if per_serving['sodium'] > 600: suitability["is_not"].append("People with High Blood Pressure")
+    if per_serving['sugar'] > 10: suitability["is_not"].append("Diabetics")
+    
+    if not suitability["is"]: suitability["is"].append("General Healthy Eating")
+    
+    return {
+        'total': total,
+        'per_serving': per_serving,
+        'ingredients': ingredient_details,
+        'health_score': score,
+        'health_tags': tags,
+        'suitability': suitability
+    }
+
+
 def generate_view(request):
     quick_ingredients = {
         '🧅 Vegetables': [
@@ -998,6 +1070,22 @@ You must return the response strictly in the following format:
             ai_response = response.choices[0].message.content
             
             recipes = parse_recipes(ai_response)
+            
+            # --- USDA API Nutrition Calculation ---
+            for recipe in recipes:
+                if recipe.get('ingredients'):
+                    real_nutri = calculate_recipe_nutrition(recipe['ingredients'], serving_size)
+                    recipe['real_nutrition'] = real_nutri
+                    
+                    # Update old nutrition dictionary to map to new per-serving values
+                    # so the frontend macro logger still works without changes
+                    if not recipe.get('nutrition'):
+                        recipe['nutrition'] = {}
+                    recipe['nutrition']['calories'] = real_nutri['per_serving']['calories']
+                    recipe['nutrition']['protein'] = real_nutri['per_serving']['protein']
+                    recipe['nutrition']['carbs'] = real_nutri['per_serving']['carbs']
+                    recipe['nutrition']['fat'] = real_nutri['per_serving']['fat']
+            
             youtube_videos = get_youtube_videos(
                 selected_dish if selected_dish else ingredients
             )
