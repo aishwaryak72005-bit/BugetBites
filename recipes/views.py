@@ -980,7 +980,22 @@ You must return the response strictly in the following format:
 
         try:
             system_instruction = "You are a helpful Indian recipe assistant. Always follow the exact format provided."
-            ai_response = call_gemini_api(prompt, system_instruction, max_tokens=1200, temperature=0.7)
+            response = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": system_instruction
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                max_tokens=1200,
+                temperature=0.7,
+            )
+            ai_response = response.choices[0].message.content
             
             recipes = parse_recipes(ai_response)
             youtube_videos = get_youtube_videos(
