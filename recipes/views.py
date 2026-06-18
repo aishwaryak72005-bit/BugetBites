@@ -1704,9 +1704,9 @@ def macros_view(request):
     )
     
     total_calories = sum(log.calories for log in today_logs)
-    total_protein = sum(log.protein_g for log in today_logs)
-    total_carbs = sum(log.carbs_g for log in today_logs)
-    total_fats = sum(log.fats_g for log in today_logs)
+    total_protein = sum((log.protein or 0) for log in today_logs)
+    total_carbs = sum((log.carbs or 0) for log in today_logs)
+    total_fats = sum((log.fats or 0) for log in today_logs)
     
     return render(request, 'recipes/macros.html', {
         'logs': today_logs,
