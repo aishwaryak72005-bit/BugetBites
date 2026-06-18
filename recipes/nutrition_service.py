@@ -141,6 +141,38 @@ def convert_to_grams(ingredient_name, quantity_str):
         except ValueError:
             pass
 
+    # Cloves
+    if 'clove' in quantity_str:
+        num_str = ''.join(c for c in quantity_str if c.isdigit() or c == '.')
+        try:
+            return float(num_str) * 3.0 if num_str else 3.0
+        except ValueError:
+            pass
+
+    # Pieces / inch
+    if 'inch' in quantity_str or 'piece' in quantity_str:
+        num_str = ''.join(c for c in quantity_str if c.isdigit() or c == '.')
+        try:
+            return float(num_str) * 5.0 if num_str else 5.0
+        except ValueError:
+            pass
+
+    # Specific small items when no unit is given (just a number)
+    num_str = ''.join(c for c in quantity_str if c.isdigit() or c == '.')
+    if num_str:
+        try:
+            qty_num = float(num_str)
+            if 'chilli' in ingredient_name or 'chili' in ingredient_name:
+                return qty_num * 3.0
+            if 'garlic' in ingredient_name:
+                return qty_num * 3.0
+            if 'ginger' in ingredient_name:
+                return qty_num * 5.0
+            if 'lemon' in ingredient_name or 'lime' in ingredient_name:
+                return qty_num * 50.0
+        except ValueError:
+            pass
+
     # If all parsing fails, try to just grab any number
     num_str = ''.join(c for c in quantity_str if c.isdigit() or c == '.')
     try:

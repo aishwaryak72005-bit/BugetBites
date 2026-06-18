@@ -383,6 +383,12 @@ def parse_recipes(ai_response):
                             if clean_name.startswith('-'):
                                 clean_name = clean_name[1:].strip()
                                 
+                        import re
+                        if clean_name and re.search(r'^[A-Za-z]+[0-9]+$', clean_name):
+                            clean_name = re.sub(r'[0-9]+$', '', clean_name).strip()
+                            if clean_name.lower() == 'egg' and measurement and measurement != '1':
+                                clean_name = 'Eggs'
+
                         recipe['ingredients'].append({
                             'text': clean_name.capitalize() if clean_name else ing_name,
                             'measurement': measurement,
@@ -754,10 +760,25 @@ def calculate_recipe_nutrition(ingredients_list, servings):
         name = ing.get('text', '').strip()
         measure = ing.get('measurement', '').strip()
         
+        # Clean up any AI anomalies like "Egg2"
+        import re
+        if name and re.search(r'^[A-Za-z]+[0-9]+$', name):
+            name = re.sub(r'[0-9]+$', '', name).strip()
+            # If we stripped it back to singular, but measure is > 1, maybe make it plural?
+            # Safe enough just to let it be what it was without the trailing digit
+            if name.lower() == 'egg' and measure and measure != '1':
+                name = 'Eggs'
+
+        display_qty = measure if measure else 'As required'
+        if 'to taste' in display_qty.lower():
+            display_qty = f"{display_qty} (~1/2 tsp)"
+        elif 'pinch' in display_qty.lower():
+            display_qty = f"{display_qty} (~1/4 tsp)"
+
         nutri = calculate_nutrition(name, measure)
         return {
             'name': name.capitalize() if name else 'Ingredient',
-            'quantity': measure if measure else 'As required',
+            'quantity': display_qty,
             'grams': nutri.get('grams', 100),
             'nutrition': nutri
         }
