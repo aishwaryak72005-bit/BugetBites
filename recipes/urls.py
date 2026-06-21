@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 from . import views
 
 urlpatterns = [
@@ -7,6 +8,14 @@ urlpatterns = [
     path('suggest/', views.suggest_view, name='suggest'),
     path('save-recipe/', views.save_recipe_view, name='save_recipe'),
     path('saved-recipes/', views.saved_recipes_view, name='saved_recipes'),
+    path('admin-dashboard/toggle-premium/<int:user_id>/', views.toggle_premium_view, name='toggle_premium'),
+    
+    # Policies for Razorpay
+    path('terms/', TemplateView.as_view(template_name='policies/terms.html'), name='terms'),
+    path('privacy/', TemplateView.as_view(template_name='policies/privacy.html'), name='privacy'),
+    path('refund/', TemplateView.as_view(template_name='policies/refund.html'), name='refund'),
+    path('contact/', TemplateView.as_view(template_name='policies/contact.html'), name='contact'),
+    
     path('delete-recipe/<int:recipe_id>/', views.delete_recipe_view, name='delete_recipe'),
     # Meal Planner
     path('meal-planner/', views.meal_planner_view, name='meal_planner'),

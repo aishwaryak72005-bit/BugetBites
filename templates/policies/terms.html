@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Terms and Conditions - BudgetBites{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card border-0 shadow-sm p-4">
+        <h1 class="mb-4">Terms and Conditions</h1>
+        <p><strong>Last updated:</strong> {% now "F d, Y" %}</p>
+        
+        <h4>1. Acceptance of Terms</h4>
+        <p>By accessing and using BudgetBites, you accept and agree to be bound by the terms and provision of this agreement.</p>
+        
+        <h4>2. Description of Service</h4>
+        <p>BudgetBites provides AI-powered recipe generation and meal planning tools. We do not guarantee the exact nutritional accuracy of AI-generated content.</p>
+        
+        <h4>3. Subscriptions</h4>
+        <p>Some parts of the Service are billed on a subscription basis ("Pro"). You will be billed in advance on a recurring and periodic basis (monthly).</p>
+        
+        <h4>4. User Accounts</h4>
+        <p>When you create an account with us, you must provide information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms.</p>
+        
+        <h4>5. Changes to Terms</h4>
+        <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. What constitutes a material change will be determined at our sole discretion.</p>
+    </div>
+</div>
+{% endblock %}

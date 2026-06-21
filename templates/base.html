@@ -996,8 +996,16 @@
 
     <div class="container mt-4">{% block content %}{% endblock %}</div>
 
-    <!-- Footer Removed -->
-
+    <!-- Footer for Razorpay compliance -->
+    <footer class="mt-auto py-4 bg-light border-top text-center text-muted" style="font-size: 0.85rem;">
+      <div class="container d-flex flex-column flex-sm-row justify-content-center gap-3">
+        <a href="{% url 'terms' %}" class="text-muted text-decoration-none hover-dark">Terms & Conditions</a>
+        <a href="{% url 'privacy' %}" class="text-muted text-decoration-none hover-dark">Privacy Policy</a>
+        <a href="{% url 'refund' %}" class="text-muted text-decoration-none hover-dark">Refund & Cancellation</a>
+        <a href="{% url 'contact' %}" class="text-muted text-decoration-none hover-dark">Contact Us</a>
+      </div>
+      <div class="mt-2">&copy; {% now "Y" %} BudgetBites. All rights reserved.</div>
+    </footer>
     <!-- Mobile Bottom Navigation -->
     {% if user.is_authenticated %}
     <div class="mobile-bottom-nav">

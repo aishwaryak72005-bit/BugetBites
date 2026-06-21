@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Refund and Cancellation Policy - BudgetBites{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card border-0 shadow-sm p-4">
+        <h1 class="mb-4">Refund & Cancellation Policy</h1>
+        <p><strong>Last updated:</strong> {% now "F d, Y" %}</p>
+        
+        <h4>1. Cancellation</h4>
+        <p>You can cancel your subscription at any time by logging into your account settings. Your cancellation will take effect at the end of the current paid term. You will retain access to Pro features until the end of this billing cycle.</p>
+        
+        <h4>2. Refunds</h4>
+        <p>Payments are non-refundable and there are no refunds or credits for partially used billing periods. We do not provide refunds for subscriptions that are forgotten or unused.</p>
+        
+        <h4>3. Exceptional Circumstances</h4>
+        <p>If you believe you have been billed in error (e.g., double billing due to a technical glitch), please contact our support team immediately for a resolution.</p>
+    </div>
+</div>
+{% endblock %}
