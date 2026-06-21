@@ -43,4 +43,55 @@
     <priority>0.6</priority>
   </url>
 
+  <!-- Pro Features & Upgrades -->
+  <url>
+    <loc>https://bugetbites.onrender.com/upgrade/</loc>
+    <lastmod>{% now "Y-m-d" %}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://bugetbites.onrender.com/macros/</loc>
+    <lastmod>{% now "Y-m-d" %}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://bugetbites.onrender.com/cravings/</loc>
+    <lastmod>{% now "Y-m-d" %}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Legal & Support Policies -->
+  <url>
+    <loc>https://bugetbites.onrender.com/terms/</loc>
+    <lastmod>{% now "Y-m-d" %}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://bugetbites.onrender.com/privacy/</loc>
+    <lastmod>{% now "Y-m-d" %}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://bugetbites.onrender.com/refund/</loc>
+    <lastmod>{% now "Y-m-d" %}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://bugetbites.onrender.com/contact/</loc>
+    <lastmod>{% now "Y-m-d" %}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
 </urlset>
