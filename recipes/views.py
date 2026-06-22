@@ -1900,24 +1900,41 @@ def upgrade_premium_view(request):
 @login_required(login_url='/login/')
 @require_POST
 def create_order_view(request):
-    """Create a Razorpay order for Rs 69."""
-    if not razorpay_client:
-        return JsonResponse({'error': 'Razorpay not configured'}, status=500)
+    """Create a Razorpay order for Rs 69 via direct API."""
+    import requests
+    from requests.auth import HTTPBasicAuth
+    
+    key_id = getattr(settings, 'RAZORPAY_KEY_ID', '')
+    key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', '')
+    
+    if not key_id or not key_secret:
+        return JsonResponse({'error': 'Razorpay keys not configured on server'}, status=500)
         
     try:
         amount = 6900 # 69 INR in paise
         currency = 'INR'
         
-        # Create order (ensure receipt length is safe and no deprecated params)
+        # Create order via REST API directly to avoid SDK incompatibility
         order_receipt = f'rcpt_{request.user.id}_{int(timezone.now().timestamp())}'
         notes = {'user_id': request.user.id, 'username': request.user.username}
         
-        razorpay_order = razorpay_client.order.create(dict(
-            amount=amount,
-            currency=currency,
-            receipt=order_receipt,
-            notes=notes
-        ))
+        response = requests.post(
+            'https://api.razorpay.com/v1/orders',
+            auth=HTTPBasicAuth(key_id, key_secret),
+            json={
+                'amount': amount,
+                'currency': currency,
+                'receipt': order_receipt,
+                'notes': notes
+            },
+            timeout=10
+        )
+        
+        if response.status_code != 200:
+            error_data = response.json()
+            return JsonResponse({'error': f"Razorpay API Error: {error_data.get('error', {}).get('description', 'Unknown error')}"}, status=400)
+            
+        razorpay_order = response.json()
         
         return JsonResponse({
             'order_id': razorpay_order['id'],
@@ -1932,8 +1949,12 @@ def create_order_view(request):
 @require_POST
 def payment_success_view(request):
     """Verify signature and upgrade user."""
-    if not razorpay_client:
-        return JsonResponse({'error': 'Razorpay not configured', 'success': False}, status=500)
+    import hmac
+    import hashlib
+    
+    key_secret = getattr(settings, 'RAZORPAY_KEY_SECRET', '')
+    if not key_secret:
+        return JsonResponse({'error': 'Razorpay secret not configured', 'success': False}, status=500)
         
     try:
         data = json.loads(request.body)
@@ -1941,15 +1962,16 @@ def payment_success_view(request):
         order_id = data.get('razorpay_order_id', '')
         signature = data.get('razorpay_signature', '')
         
-        # Verify signature
-        params_dict = {
-            'razorpay_order_id': order_id,
-            'razorpay_payment_id': payment_id,
-            'razorpay_signature': signature
-        }
+        # Verify signature manually
+        msg = f"{order_id}|{payment_id}"
+        generated_signature = hmac.new(
+            key_secret.encode('utf-8'),
+            msg.encode('utf-8'),
+            hashlib.sha256
+        ).hexdigest()
         
-        # This will raise a SignatureVerificationError if invalid
-        razorpay_client.utility.verify_payment_signature(params_dict)
+        if generated_signature != signature:
+            raise ValueError("Invalid Signature")
         
         # Update user profile
         profile = request.user.profile
