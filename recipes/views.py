@@ -1642,19 +1642,17 @@ def scan_fridge_api(request):
 
 # ─── Premium Features & Craving Mode ─────────────────────────────────────────
 
-def upgrade_premium_view(request):
-    return render(request, 'recipes/upgrade.html')
+
 
 @login_required(login_url='/login/')
 def craving_view(request):
-    # The Bouncer: Only allow Admins (Superusers) for now, as payment isn't integrated
-    if not request.user.is_superuser:
+    if not is_user_premium(request.user):
         return redirect('upgrade_premium')
     return render(request, 'recipes/cravings.html')
 
 @login_required(login_url='/login/')
 def api_cravings_checklist(request):
-    if not request.user.is_superuser:
+    if not is_user_premium(request.user):
         return JsonResponse({'error': 'Premium required'}, status=403)
         
     if request.method == 'POST':
@@ -1690,7 +1688,7 @@ def api_cravings_checklist(request):
 
 @login_required(login_url='/login/')
 def api_cravings_instructions(request):
-    if not request.user.is_superuser:
+    if not is_user_premium(request.user):
         return JsonResponse({'error': 'Premium required'}, status=403)
         
     if request.method == 'POST':
@@ -1873,10 +1871,12 @@ except ImportError:
     razorpay_client = None
 
 def check_premium_status(user):
-    """Check if premium has expired and revoke if needed."""
+    """Check if premium has expired and revoke if needed. Handled safely to avoid lag."""
     if not user.is_authenticated:
         return
     try:
+        if not hasattr(user, 'profile'):
+            return
         profile = user.profile
         if profile.is_premium and profile.premium_end_date:
             if timezone.now() > profile.premium_end_date:
